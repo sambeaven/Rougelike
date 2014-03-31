@@ -32,12 +32,14 @@ namespace Rougelike
             //place player
             PlacePlayer(playerLocationX, playerLocationY);
 
-            
 
+            ConsoleKeyInfo keyInfo;
             //listen for input and handle moves
             do
             {
-                var keyInfo = Console.ReadKey();
+                keyInfo = Console.ReadKey(true);
+                
+
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.UpArrow:
@@ -58,7 +60,7 @@ namespace Rougelike
 
                 PlacePlayer(playerLocationX, playerLocationY);
 
-            } while (Console.ReadKey().Key != ConsoleKey.Escape);
+            } while (keyInfo.Key != ConsoleKey.Escape);
 
             //end game
             //Console.ReadLine();
