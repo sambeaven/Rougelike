@@ -22,43 +22,48 @@ namespace Rougelike
 
     class Program
     {
+
         static void Main(string[] args)
         {
             //draw dungeon
-            DrawMap();
+            var map = DrawMap();
 
-            int playerLocationX = 5;
-            int playerLocationY = 10;
+            var hero = new GameLogic.RLAgent() { locationX = 5, locationY = 10, DisplayChar = '@' };
+
+            int? playerDestinationX = null, playerDestinationY = null;
             //place player
-            PlacePlayer(playerLocationX, playerLocationY);
+            PlacePlayer(map, hero, hero.locationX, hero.locationY);
 
 
             ConsoleKeyInfo keyInfo;
             //listen for input and handle moves
             do
             {
+                playerDestinationX = hero.locationX;
+                playerDestinationY = hero.locationY;
+
                 keyInfo = Console.ReadKey(true);
-                
+
 
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        playerLocationY--;
+                        playerDestinationY = hero.locationY - 1;
                         break;
                     case ConsoleKey.DownArrow:
-                        playerLocationY++;
+                        playerDestinationY = hero.locationY + 1;
                         break;
                     case ConsoleKey.LeftArrow:
-                        playerLocationX--;
+                        playerDestinationX = hero.locationX - 1;
                         break;
                     case ConsoleKey.RightArrow:
-                        playerLocationX++;
+                        playerDestinationX = hero.locationX + 1;
                         break;
                     default:
                         break;
                 }
 
-                PlacePlayer(playerLocationX, playerLocationY);
+                PlacePlayer(map, hero, playerDestinationX, playerDestinationY);
 
             } while (keyInfo.Key != ConsoleKey.Escape);
 
@@ -66,38 +71,36 @@ namespace Rougelike
             //Console.ReadLine();
         }
 
-        private static void PlacePlayer(int x, int y)
+        private static void PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, int? x, int? y)
         {
-            DrawMap();
-            Console.SetCursorPosition(x, y);
-            Console.Write("@");
-            Console.SetCursorPosition(0, 20);
+            if ((x.HasValue && y.HasValue) && map.isLocationPassable(x.Value, y.Value))
+            {
+                DrawMap();
+                hero.locationY = y.Value;
+                hero.locationX = x.Value;
+
+
+                Console.SetCursorPosition(x.Value, y.Value);
+                Console.Write(hero.DisplayChar);
+
+                Console.SetCursorPosition(0, 20);
+            }
         }
 
-        private static void DrawMap(int mapWidth = 10, int mapHeight = 20)
+        private static GameLogic.RLMap DrawMap()
         {
-            //outer boundraries are walls
-            //inner boundraries are floors
-            const string MAP_WALL = "#";
-            const string MAP_FLOOR = ".";
-            string tileToPrint;
-            for (int x = 0; x < mapWidth; x++)
+            GameLogic.RLMap map = new GameLogic.RLMap();
+
+            for (int x = 0; x < map.MaxWidth; x++)
             {
-                for (int y = 0; y < mapHeight; y++)
+                for (int y = 0; y < map.MaxHeight; y++)
                 {
-                    if (x == 0 || x == mapWidth -1 || y == 0 || y == mapHeight - 1)
-                    {
-                        tileToPrint = MAP_WALL;
-                    }
-                    else
-                    {
-                        tileToPrint = MAP_FLOOR;
-                    }
                     Console.SetCursorPosition(x, y);
-                    Console.Write(tileToPrint);
+                    Console.Write(map.Where(c => c.X == x && c.Y == y).FirstOrDefault().DisplayCharacter);
                 }
             }
-
+            return map;
         }
+
     }
 }
