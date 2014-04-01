@@ -6,19 +6,6 @@ using System.Threading.Tasks;
 
 namespace Rougelike
 {
-    //Wider Architecture:
-
-    //Class Entity (anything interactable) - has an Interact() method and a DisplayChar() property.
-    //              Interact takes a player? Or just an entity? Player makes more sense.
-    //Class Player inherits from Entity. Interact() causes the player to lose health? Maybe?
-    //Class Monster : Entity - Interact() method causes player to lose health
-    //Monster and Player both have HP and Attack properties, and a List of Items. 
-    //              On death, monsters (and players?) drop treasure piles
-
-    //Item has a Use(Entity) method
-
-
-
 
     class Program
     {
@@ -28,7 +15,7 @@ namespace Rougelike
             //draw dungeon
             var map = DrawMap();
 
-            var hero = new GameLogic.RLAgent() { locationX = 5, locationY = 10, DisplayChar = '@' };
+            var hero = new GameLogic.RLAgent(locationX: 5, locationY: 10, displayChar: '@', hitPoints: 200, strength: 50, dexterity: 50);
 
             int? playerDestinationX = null, playerDestinationY = null;
             //place player
@@ -44,27 +31,40 @@ namespace Rougelike
 
                 keyInfo = Console.ReadKey(true);
 
+                List<Tuple<ConsoleColor, string>> messages = new List<Tuple<ConsoleColor, string>>();
 
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.UpArrow:
                         playerDestinationY = hero.locationY - 1;
+                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step north"));
                         break;
                     case ConsoleKey.DownArrow:
                         playerDestinationY = hero.locationY + 1;
+                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step south"));
                         break;
                     case ConsoleKey.LeftArrow:
                         playerDestinationX = hero.locationX - 1;
+                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step west"));
                         break;
                     case ConsoleKey.RightArrow:
                         playerDestinationX = hero.locationX + 1;
+                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step east"));
+                        break;
+                    case ConsoleKey.Spacebar:
+                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You wait"));
                         break;
                     default:
                         break;
                 }
 
                 PlacePlayer(map, hero, playerDestinationX, playerDestinationY);
-
+                foreach (var message in messages)
+                {
+                    //This doesn't work very well. I think I need a stack of messages (say, the last 5) and to write all of them.
+                    Console.ForegroundColor = message.Item1;
+                    Console.WriteLine(message.Item2);
+                }
             } while (keyInfo.Key != ConsoleKey.Escape);
 
             //end game
@@ -89,6 +89,7 @@ namespace Rougelike
 
         private static GameLogic.RLMap DrawMap()
         {
+            Console.ForegroundColor = ConsoleColor.White;
             GameLogic.RLMap map = new GameLogic.RLMap();
 
             for (int x = 0; x < map.MaxWidth; x++)

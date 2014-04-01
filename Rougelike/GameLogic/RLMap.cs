@@ -8,17 +8,22 @@ namespace Rougelike.GameLogic
 {
     public class RLMap : List<RLCell>
     {
+
         public const char MAP_WALL = '#';
         public const char MAP_FLOOR = '.';
 
-        public RLMap (int mapWidth = 10, int mapHeight = 20)
+        public RLMap(int mapWidth = 50, int mapHeight = 20)
+        {
+            this.MaxHeight = mapHeight;
+            this.MaxWidth = mapWidth;
+            GenerateBoxMap(mapWidth, mapHeight);
+        }
+
+
+        private void GenerateBoxMap(int mapWidth, int mapHeight)
         {
             //outer boundraries are walls
             //inner boundraries are floors
-
-            this.MaxHeight = mapHeight;
-            this.MaxWidth = mapWidth;
-
             for (int x = 0; x < mapWidth; x++)
             {
                 for (int y = 0; y < mapHeight; y++)
@@ -41,7 +46,7 @@ namespace Rougelike.GameLogic
 
                     this.Add(cell);
                 }
-            }   
+            }
         }
 
         public int MaxHeight { get; set; }
