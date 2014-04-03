@@ -13,13 +13,14 @@ namespace Rougelike
         static void Main(string[] args)
         {
             //draw dungeon
+            Stack<Tuple<ConsoleColor, string>> messages = new Stack<Tuple<ConsoleColor, string>>();
             var map = DrawMap();
 
             var hero = new GameLogic.RLAgent(locationX: 5, locationY: 10, displayChar: '@', hitPoints: 200, strength: 50, dexterity: 50);
 
             int? playerDestinationX = null, playerDestinationY = null;
             //place player
-            PlacePlayer(map, hero, hero.locationX, hero.locationY);
+            PlacePlayer(map, hero, hero.locationX, hero.locationY, messages);
 
 
             ConsoleKeyInfo keyInfo;
@@ -31,51 +32,73 @@ namespace Rougelike
 
                 keyInfo = Console.ReadKey(true);
 
-                List<Tuple<ConsoleColor, string>> messages = new List<Tuple<ConsoleColor, string>>();
-
+                //TODO: re-architect this: move message logic down into the TakeTurn method. Figure out direction after running through PlacePlayer()
+                //(maybe we should re-architect all of this into a class?)
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.UpArrow:
                         playerDestinationY = hero.locationY - 1;
-                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step north"));
+                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step north"));
                         break;
                     case ConsoleKey.DownArrow:
                         playerDestinationY = hero.locationY + 1;
-                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step south"));
+                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step south"));
                         break;
                     case ConsoleKey.LeftArrow:
                         playerDestinationX = hero.locationX - 1;
-                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step west"));
+                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step west"));
                         break;
                     case ConsoleKey.RightArrow:
                         playerDestinationX = hero.locationX + 1;
-                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step east"));
+                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step east"));
                         break;
                     case ConsoleKey.Spacebar:
-                        messages.Add(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You wait"));
+                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You wait"));
                         break;
                     default:
                         break;
                 }
 
-                PlacePlayer(map, hero, playerDestinationX, playerDestinationY);
-                foreach (var message in messages)
-                {
-                    //This doesn't work very well. I think I need a stack of messages (say, the last 5) and to write all of them.
-                    Console.ForegroundColor = message.Item1;
-                    Console.WriteLine(message.Item2);
-                }
+                TakeTurn(map, hero, playerDestinationX, playerDestinationY, messages);
+
+
             } while (keyInfo.Key != ConsoleKey.Escape);
 
             //end game
             //Console.ReadLine();
         }
 
-        private static void PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, int? x, int? y)
+        private static void TakeTurn(GameLogic.RLMap map, GameLogic.RLAgent hero, int? x, int? y, Stack<Tuple<ConsoleColor, string>> messages)
+        {
+            DrawMap();
+            messages = PlacePlayer(map, hero, x, y, messages);
+
+
+            //post messages
+            Console.SetCursorPosition(0, 20);
+            var messagesToDisplay = messages.Take(5).ToList();
+            int i = 0;
+            foreach (var message in messages)
+            {
+
+
+                Console.SetCursorPosition(0, 20 + i);
+
+                Console.ForegroundColor = message.Item1;
+                Console.WriteLine(message.Item2.Trim() + new String(' ', Console.BufferWidth));
+                if (i >= 4) { break; } else { i++; }
+
+            }
+            Console.SetCursorPosition(0, 0);
+            Console.CursorVisible = false;
+
+        }
+
+        private static Stack<Tuple<ConsoleColor, string>> PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, int? x, int? y, Stack<Tuple<ConsoleColor, string>> messages)
         {
             if ((x.HasValue && y.HasValue) && map.isLocationPassable(x.Value, y.Value))
             {
-                DrawMap();
+
                 hero.locationY = y.Value;
                 hero.locationX = x.Value;
 
@@ -83,12 +106,21 @@ namespace Rougelike
                 Console.SetCursorPosition(x.Value, y.Value);
                 Console.Write(hero.DisplayChar);
 
-                Console.SetCursorPosition(0, 20);
+                
             }
+            else
+            {
+                Console.SetCursorPosition(hero.locationX, hero.locationY);
+                Console.Write(hero.DisplayChar);
+                messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall."));
+            }
+
+            return messages;
         }
 
         private static GameLogic.RLMap DrawMap()
         {
+            //Console.Clear();
             Console.ForegroundColor = ConsoleColor.White;
             GameLogic.RLMap map = new GameLogic.RLMap();
 
