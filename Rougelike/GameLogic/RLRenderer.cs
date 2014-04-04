@@ -19,14 +19,10 @@ namespace Rougelike.GameLogic
             messages = new Stack<Tuple<ConsoleColor, string>>();
         }
 
-        public void TakeTurn(GameLogic.RLMap map, GameLogic.RLAgent hero, int? x, int? y)
+        public void TakeTurn(GameLogic.RLMap map, GameLogic.RLAgent hero, ConsoleKeyInfo cki)
         {
-            
-
-
             DrawMap();
-            messages = PlacePlayer(map, hero, x, y, messages);
-
+            PlacePlayer(map, hero, cki);
 
             //post messages
             Console.SetCursorPosition(0, 20);
@@ -46,47 +42,59 @@ namespace Rougelike.GameLogic
 
         }
 
-        public Stack<Tuple<ConsoleColor, string>> PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, int? x, int? y, Stack<Tuple<ConsoleColor, string>> messages)
+        private void PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, ConsoleKeyInfo cki)
         {
-            if ((x.HasValue && y.HasValue) && map.isLocationPassable(x.Value, y.Value))
-            {
-                if (y < hero.locationY)
-                {
-                    //y - 1 == north
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step north"));
-                }
-                else if (y > hero.locationY)
-                {
-                    //y + 1 == south
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step south"));
-                }
-                else if (x < hero.locationX)
-                {
-                    //x - 1 == west
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step west"));
-                }
-                else if (x > hero.locationX)
-                {
-                    //x + 1 == east
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step east"));
-                }
-                else
-                {
-                    //no change == wait
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Cyan, "You wait"));
-                }
+            int playerDestinationX, playerDestinationY;
 
-                hero.locationY = y.Value;
-                hero.locationX = x.Value;
+            playerDestinationX = hero.locationX;
+            playerDestinationY = hero.locationY;
+
+            var messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.White, "");
+
+
+            switch (cki.Key)
+            {
+                case ConsoleKey.UpArrow:
+                    playerDestinationY = hero.locationY - 1;
+                    messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step north");
+                    break;
+                case ConsoleKey.DownArrow:
+                    playerDestinationY = hero.locationY + 1;
+                    messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step south");
+                    break;
+                case ConsoleKey.LeftArrow:
+                    playerDestinationX = hero.locationX - 1;
+                    messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step west");
+                    break;
+                case ConsoleKey.RightArrow:
+                    playerDestinationX = hero.locationX + 1;
+                    messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step east");
+                    break;
+                case ConsoleKey.Spacebar:
+                    messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Cyan, "You wait");
+                    break;
+                default:
+                    break;
+            }
+
+
+
+            if (map.isLocationPassable(playerDestinationX, playerDestinationY))
+            {
+
+                hero.locationX = playerDestinationX;
+                hero.locationY = playerDestinationY;
             }
             else
             {
-
-                messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall."));
+                messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall.");
             }
+
+            messages.Push(messageToAdd);
+
             Console.SetCursorPosition(hero.locationX, hero.locationY);
             Console.Write(hero.DisplayChar);
-            return messages;
+            
         }
 
         public GameLogic.RLMap DrawMap()

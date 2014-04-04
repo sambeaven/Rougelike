@@ -18,7 +18,7 @@ namespace Rougelike
 
             var hero = new GameLogic.RLAgent(locationX: 5, locationY: 10, displayChar: '@', hitPoints: 200, strength: 50, dexterity: 50);
 
-            int? playerDestinationX = null, playerDestinationY = null;
+            
             //place player
             Console.SetCursorPosition(hero.locationX, hero.locationY);
             Console.Write(hero.DisplayChar);
@@ -28,35 +28,9 @@ namespace Rougelike
             //listen for input and handle moves
             do
             {
-                playerDestinationX = hero.locationX;
-                playerDestinationY = hero.locationY;
-
                 keyInfo = Console.ReadKey(true);
 
-                
-                switch (keyInfo.Key)
-                {
-                    case ConsoleKey.UpArrow:
-                        playerDestinationY = hero.locationY - 1;
-                        break;
-                    case ConsoleKey.DownArrow:
-                        playerDestinationY = hero.locationY + 1;
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        playerDestinationX = hero.locationX - 1;
-                        break;
-                    case ConsoleKey.RightArrow:
-                        playerDestinationX = hero.locationX + 1;
-                        break;
-                    case ConsoleKey.Spacebar:
-                        break;
-                    default:
-                        break;
-                }
-
-                renderer.TakeTurn(map, hero, playerDestinationX, playerDestinationY);
-
-
+                renderer.TakeTurn(map, hero, keyInfo);
             } while (keyInfo.Key != ConsoleKey.Escape);
 
             //end game
