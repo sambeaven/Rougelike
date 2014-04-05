@@ -14,6 +14,8 @@ namespace Rougelike.GameLogic
 
         public Stack<Tuple<ConsoleColor, string>> messages { get; set; }
 
+        public List<RLAgent> agents = new List<RLAgent>();
+
         public RLRenderer()
         {
             messages = new Stack<Tuple<ConsoleColor, string>>();
@@ -22,7 +24,31 @@ namespace Rougelike.GameLogic
         public void TakeTurn(GameLogic.RLMap map, GameLogic.RLAgent hero, ConsoleKeyInfo cki)
         {
             DrawMap();
-            PlacePlayer(map, hero, cki);
+
+            //movement
+            foreach (var agent in agents)
+            {
+                if (agent.GetType() == typeof(RLHero))
+                {
+                    PlacePlayer(map, agent, cki);
+                }
+                else
+                {
+                    PlaceAgent(map, agent);
+                }
+            }
+
+            //remove dead agents
+            foreach (var agent in agents)
+            {
+                if (agent.HitPoints <= 0)
+                {
+                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.DarkYellow, agent.Name + " dies."));
+                    map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = true;
+                }
+            }
+
+            agents = agents.Where(a => a.HitPoints > 0).ToList();
 
             //post messages
             Console.SetCursorPosition(0, 20);
@@ -40,6 +66,13 @@ namespace Rougelike.GameLogic
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
 
+        }
+
+        private void PlaceAgent(RLMap map, RLAgent agent)
+        {
+            Console.SetCursorPosition(agent.locationX, agent.locationY);
+            Console.Write(agent.DisplayChar);
+            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = false;
         }
 
         private void PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, ConsoleKeyInfo cki)
@@ -77,13 +110,21 @@ namespace Rougelike.GameLogic
                     break;
             }
 
-
+            var destinationAgent = agents.Where(a => a.locationX == playerDestinationX && a.locationY == playerDestinationY).FirstOrDefault();
 
             if (map.isLocationPassable(playerDestinationX, playerDestinationY))
             {
 
                 hero.locationX = playerDestinationX;
                 hero.locationY = playerDestinationY;
+            }
+            else if(destinationAgent != null)
+            {
+                var attackResults = destinationAgent.attackedBy(hero);
+                foreach (var attackMessage in attackResults)
+                {
+                    messages.Push(new Tuple<ConsoleColor,string>(ConsoleColor.Red, attackMessage));
+                }
             }
             else
             {
@@ -94,7 +135,7 @@ namespace Rougelike.GameLogic
 
             Console.SetCursorPosition(hero.locationX, hero.locationY);
             Console.Write(hero.DisplayChar);
-            
+
         }
 
         public GameLogic.RLMap DrawMap()

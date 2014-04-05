@@ -16,15 +16,50 @@ namespace Rougelike
             //draw dungeon
             var map = renderer.DrawMap();
 
-            var hero = new GameLogic.RLAgent(locationX: 5, locationY: 10, displayChar: '@', hitPoints: 200, strength: 50, dexterity: 50);
+            var hero = new GameLogic.RLHero(
+                locationX: 5, 
+                locationY: 10, 
+                displayChar: '@', 
+                hitPoints: 200, 
+                strength: 50, 
+                dexterity: 50,
+                name: "You",
+                constitution: 50
+                );
 
-            
+            var monster1 = new GameLogic.RLMonster(
+                locationX: 10,
+                locationY: 10,
+                displayChar: 'g',
+                hitPoints: 200,
+                strength: 25,
+                dexterity: 25,
+                name: "Goblin",
+                constitution: 25
+                );
+
+            var monster2 = new GameLogic.RLMonster(
+                locationX: 10,
+                locationY: 15,
+                displayChar: 'X',
+                hitPoints: 200,
+                strength: 75,
+                dexterity: 75,
+                name: "Balrog",
+                constitution: 75
+                );
+
+            renderer.agents.Add(hero);
+            renderer.agents.Add(monster1);
+            renderer.agents.Add(monster2);
+
             //place player
-            Console.SetCursorPosition(hero.locationX, hero.locationY);
-            Console.Write(hero.DisplayChar);
 
+            //turn this into a TakeInitialTurn method? Or Setup?
+            //I could put all the above setup code in there as well (although it's not likely to stay there).
+            ConsoleKeyInfo keyInfo = new ConsoleKeyInfo();
+            renderer.TakeTurn(map, hero, keyInfo);
 
-            ConsoleKeyInfo keyInfo;
             //listen for input and handle moves
             do
             {
