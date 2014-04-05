@@ -6,8 +6,8 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 
 ## Current Todos:
 
-- Monsters
-- Fighting monsters
+- Monsters (movement etc)
+- Agent colours (i.e. colour for hero and for monsters)
 - Implement saving/loading
 - Random dungeon generation
 
