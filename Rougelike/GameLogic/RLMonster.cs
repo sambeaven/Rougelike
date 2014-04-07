@@ -14,5 +14,23 @@ namespace Rougelike.GameLogic
 
         }
 
+        public enum MonsterBehaviour
+        {
+            aggressive,
+            passive,
+            cowardly
+        }
+
+        private MonsterBehaviour _monsterBehaviour;
+
+        public MonsterBehaviour monsterBehaviour
+        {
+            get { return _monsterBehaviour; }
+            set { _monsterBehaviour = value; }
+        }
+        
+
+
+
     }
 }

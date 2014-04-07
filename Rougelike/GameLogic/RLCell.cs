@@ -13,6 +13,8 @@ namespace Rougelike.GameLogic
 
         public bool Passable { get; set; }
 
+        public bool Transparent { get; set; }
+
         /// <summary>
         /// Refactor this? This feels like display logic that should really be somewhere else.
         /// </summary>

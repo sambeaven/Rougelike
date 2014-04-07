@@ -70,9 +70,70 @@ namespace Rougelike.GameLogic
 
         private void PlaceAgent(RLMap map, RLAgent agent)
         {
+            if (agent.GetType() == typeof(RLMonster)) //always true at the moment, but might not be if I introduce NPCs.
+            {
+                var hero = agents.Where(a => a.GetType() == typeof(RLHero)).First();
+
+                //if monster can see hero, move according to monster behaviour
+                if (CanSeeEachOther(agent, hero, map))
+                {
+                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, agent.Name + " can see " + hero.Name + "!"));
+                }
+                else //otherwise, move at random
+                { 
+                
+                
+                }
+
+            }
+
+
             Console.SetCursorPosition(agent.locationX, agent.locationY);
             Console.Write(agent.DisplayChar);
             map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = false;
+        }
+
+        private bool CanSeeEachOther(RLAgent first, RLAgent second, RLMap map)
+        {
+            Func<int, int> moveTowardsX = null;
+            Func<int, int> moveTowardsY = null;
+
+            if (first.locationX > second.locationX)
+            {
+                moveTowardsX = x => x - 1; 
+            }
+            else
+            {
+                moveTowardsX = x => x + 1; 
+            }
+
+            if (first.locationY > second.locationY)
+            {
+                moveTowardsY = y => y - 1;
+            }
+            else
+            {
+                moveTowardsY = y => y + 1;
+            }
+
+            int checkX = first.locationX;
+            int checkY = first.locationY;
+
+            do
+            {
+                checkX = moveTowardsX(checkX);
+                checkY = moveTowardsY(checkY);
+
+                var cellToCheck = map.Where(c => c.X == checkX && c.Y == checkY).FirstOrDefault();
+
+                if (!cellToCheck.Transparent)
+                {
+                    return false;
+                } 
+            } while (second.locationX != checkX && second.locationY != checkY);
+
+
+            return true;
         }
 
         private void PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, ConsoleKeyInfo cki)

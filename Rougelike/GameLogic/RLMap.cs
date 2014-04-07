@@ -34,11 +34,13 @@ namespace Rougelike.GameLogic
                     {
                         cell.DisplayCharacter = MAP_WALL;
                         cell.Passable = false;
+                        cell.Transparent = false;
                     }
                     else
                     {
                         cell.DisplayCharacter = MAP_FLOOR;
                         cell.Passable = true;
+                        cell.Transparent = true;
                     }
 
                     cell.X = x;
