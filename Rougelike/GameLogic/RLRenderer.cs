@@ -72,17 +72,41 @@ namespace Rougelike.GameLogic
         {
             if (agent.GetType() == typeof(RLMonster)) //always true at the moment, but might not be if I introduce NPCs.
             {
-                var hero = agents.Where(a => a.GetType() == typeof(RLHero)).First();
+                var monster = (RLMonster)agent;
+                var hero =  (RLHero)agents.Where(a => a.GetType() == typeof(RLHero)).First();
+
+                Tuple<int, int> destination = null;
 
                 //if monster can see hero, move according to monster behaviour
                 if (CanSeeEachOther(agent, hero, map))
                 {
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, agent.Name + " can see " + hero.Name + "!"));
+
+
+                    //messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, agent.Name + " can see " + hero.Name + "!"));
+                    switch (monster.monsterBehaviour)
+                    {
+                        case RLMonster.MonsterBehaviour.aggressive:
+                            destination = moveTowards(monster, hero);
+                            break;
+                        case RLMonster.MonsterBehaviour.passive:
+                            destination = moveRandom(monster);
+                            break;
+                        case RLMonster.MonsterBehaviour.cowardly:
+                            destination = moveAway(monster, hero);
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 else //otherwise, move at random
-                { 
-                
-                
+                {
+                    destination = moveRandom(monster);
+
+                }
+
+                if (destination != null)
+                {
+                    //TODO: Actual move logic (including collision detection, and attacking hero)
                 }
 
             }
@@ -93,6 +117,128 @@ namespace Rougelike.GameLogic
             map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = false;
         }
 
+        private Tuple<int, int> moveRandom(RLAgent agent)
+        {
+            Random randomDirection = new Random();
+
+            int direction = randomDirection.Next(1, 4);
+            int x = agent.locationX, y = agent.locationY;
+
+            switch (direction)
+            {
+                case 1:
+                    //north
+                    y = agent.locationY - 1;
+                    break;
+                case 2:
+                    //south
+                    y = agent.locationY + 1;
+                    break;
+                case 3:
+                    //east
+                    x = agent.locationX - 1;
+                    break;
+                case 4:
+                    //west
+                    x = agent.locationX + 1;
+                    break;
+                default:
+                    break;
+            }
+
+            return new Tuple<int, int>(x, y);
+        }
+
+        private Tuple<int, int> moveAway(RLMonster monster, RLHero hero)
+        {
+            //work out differences to find the axis with the greatest difference. We'll move along that axis.
+
+            int x = monster.locationX, y = monster.locationY;
+
+            int xDiff = monster.locationX - hero.locationX;
+            int yDiff = monster.locationY - hero.locationY;
+
+            if (xDiff < 0)
+            {
+                xDiff = xDiff * -1;
+            }
+
+            if (yDiff < 0)
+            {
+                yDiff = yDiff * -1;
+            }
+
+            if (xDiff >= yDiff)
+            {
+                if (hero.locationX > monster.locationX)
+                {
+                    x--;
+                }
+                else
+                {
+                    x++;
+                }
+            }
+            else
+            {
+                if (hero.locationY > monster.locationY)
+                {
+                    y--;
+                }
+                else
+                {
+                    y++;
+                }
+            }
+
+            return new Tuple<int, int>(x, y);
+        }
+
+        private Tuple<int, int> moveTowards(RLMonster monster, RLHero hero)
+        {
+            //work out differences to find the axis with the greatest difference. We'll move along that axis.
+
+            int x = monster.locationX, y = monster.locationY;
+
+            int xDiff = monster.locationX - hero.locationX;
+            int yDiff = monster.locationY - hero.locationY;
+
+            if (xDiff < 0)
+            {
+                xDiff = xDiff * -1;
+            }
+
+            if (yDiff < 0)
+            {
+                yDiff = yDiff * -1;
+            }
+
+            if (xDiff >= yDiff)
+            {
+                if (hero.locationX > monster.locationX)
+                {
+                    x++;
+                }
+                else
+                {
+                    x--;
+                }
+            }
+            else
+            {
+                if (hero.locationY > monster.locationY)
+                {
+                    y++;
+                }
+                else
+                {
+                    y--;
+                }
+            }
+
+            return new Tuple<int, int>(x, y);
+        }
+
         private bool CanSeeEachOther(RLAgent first, RLAgent second, RLMap map)
         {
             Func<int, int> moveTowardsX = null;
@@ -100,11 +246,11 @@ namespace Rougelike.GameLogic
 
             if (first.locationX > second.locationX)
             {
-                moveTowardsX = x => x - 1; 
+                moveTowardsX = x => x - 1;
             }
             else
             {
-                moveTowardsX = x => x + 1; 
+                moveTowardsX = x => x + 1;
             }
 
             if (first.locationY > second.locationY)
@@ -121,16 +267,16 @@ namespace Rougelike.GameLogic
 
             do
             {
-                checkX = moveTowardsX(checkX);
-                checkY = moveTowardsY(checkY);
+                checkX = (checkX != second.locationX) ? moveTowardsX(checkX) : checkX;
+                checkY = (checkY != second.locationY) ? moveTowardsY(checkY) : checkY;
 
                 var cellToCheck = map.Where(c => c.X == checkX && c.Y == checkY).FirstOrDefault();
 
                 if (!cellToCheck.Transparent)
                 {
                     return false;
-                } 
-            } while (second.locationX != checkX && second.locationY != checkY);
+                }
+            } while (second.locationX != checkX || second.locationY != checkY);
 
 
             return true;
@@ -179,12 +325,12 @@ namespace Rougelike.GameLogic
                 hero.locationX = playerDestinationX;
                 hero.locationY = playerDestinationY;
             }
-            else if(destinationAgent != null)
+            else if (destinationAgent != null)
             {
                 var attackResults = destinationAgent.attackedBy(hero);
                 foreach (var attackMessage in attackResults)
                 {
-                    messages.Push(new Tuple<ConsoleColor,string>(ConsoleColor.Red, attackMessage));
+                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
                 }
             }
             else

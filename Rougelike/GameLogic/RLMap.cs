@@ -30,7 +30,7 @@ namespace Rougelike.GameLogic
                 {
                     RLCell cell = new RLCell();
 
-                    if (x == 0 || x == mapWidth - 1 || y == 0 || y == mapHeight - 1)
+                    if (x == 0 || x == mapWidth - 1 || x == 20 && y < 15 || y == 0 || y == mapHeight - 1)
                     {
                         cell.DisplayCharacter = MAP_WALL;
                         cell.Passable = false;
