@@ -64,6 +64,5 @@ namespace Rougelike.GameLogic
             }
             return false;
         }
-
     }
 }

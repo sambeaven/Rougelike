@@ -6,12 +6,14 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 
 ## Current Todos:
 
-- Monsters (movement etc)
+- Introduce looser coupling so that we can actually unit test this mother hubbard
 - Improve map system to make it a bit easier to customize dungeons for testing
 - Agent colours (i.e. colour for hero and for monsters)
 - Implement saving/loading
-- Random dungeon generation
+- Random dungeon/monster generation
 
 ## Known Bugs:
 
-- Monsters don't move and post annoying messages if they can see you. This is for testing purposes, but it will be changing down the line.
+- You get a 'Ouch! You walked into a wall' message when backtracking. This does not impede movement
+- Monsters can get stuck next to each other
+- The game doesn't end nicely if you die

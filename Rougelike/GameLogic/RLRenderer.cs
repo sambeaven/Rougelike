@@ -48,7 +48,16 @@ namespace Rougelike.GameLogic
                 }
             }
 
+
+            agents.Where(a => a.HitPoints <= 0)
+                .ToList()
+                .ForEach(a => messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.DarkRed, a.Name + " died.")));
+
+
             agents = agents.Where(a => a.HitPoints > 0).ToList();
+
+
+
 
             //post messages
             Console.SetCursorPosition(0, 20);
@@ -106,13 +115,36 @@ namespace Rougelike.GameLogic
 
                 if (destination != null)
                 {
-                    //TODO: Actual move logic (including collision detection, and attacking hero)
+                    if (destination.Item1 == hero.locationX && destination.Item2 == hero.locationY)
+                    {
+                        //redraw in the same location
+                        DrawAgent(map, monster, monster.locationX, monster.locationY);
+                        //attack hero
+                        var attackResults = hero.attackedBy(monster);
+                        foreach (var attackMessage in attackResults)
+                        {
+                            messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
+                        }
+                    }
+                    else if (map.isLocationPassable(destination.Item1, destination.Item2))
+                    {
+                        DrawAgent(map, monster, destination.Item1, destination.Item2);
+                    }
+                    else
+                    {
+                        //redraw in the same location
+                        DrawAgent(map, monster, monster.locationX, monster.locationY);
+                    }
                 }
-
             }
+        }
 
-
-            Console.SetCursorPosition(agent.locationX, agent.locationY);
+        private void DrawAgent(RLMap map, RLAgent agent, int x, int y)
+        {
+            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = true;
+            Console.SetCursorPosition(x, y);
+            agent.locationX = x;
+            agent.locationY = y;
             Console.Write(agent.DisplayChar);
             map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = false;
         }
@@ -319,29 +351,31 @@ namespace Rougelike.GameLogic
 
             var destinationAgent = agents.Where(a => a.locationX == playerDestinationX && a.locationY == playerDestinationY).FirstOrDefault();
 
-            if (map.isLocationPassable(playerDestinationX, playerDestinationY))
+            if (cki.Key != ConsoleKey.Spacebar)
             {
-
-                hero.locationX = playerDestinationX;
-                hero.locationY = playerDestinationY;
-            }
-            else if (destinationAgent != null)
-            {
-                var attackResults = destinationAgent.attackedBy(hero);
-                foreach (var attackMessage in attackResults)
+                if (map.isLocationPassable(playerDestinationX, playerDestinationY))
                 {
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
+
+                    hero.locationX = playerDestinationX;
+                    hero.locationY = playerDestinationY;
                 }
-            }
-            else
-            {
-                messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall.");
-            }
+                else if (destinationAgent != null)
+                {
+                    var attackResults = destinationAgent.attackedBy(hero);
+                    foreach (var attackMessage in attackResults)
+                    {
+                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
+                    }
+                }
+                else
+                {
+                    messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall.");
+                }
 
-            messages.Push(messageToAdd);
+                
+            } messages.Push(messageToAdd);
 
-            Console.SetCursorPosition(hero.locationX, hero.locationY);
-            Console.Write(hero.DisplayChar);
+            DrawAgent(map, hero, playerDestinationX, playerDestinationY);
 
         }
 
