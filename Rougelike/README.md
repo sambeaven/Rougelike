@@ -14,6 +14,10 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 
 ## Known Bugs:
 
-- You get a 'Ouch! You walked into a wall' message when backtracking. This does not impede movement
+
 - Monsters can get stuck next to each other
 - The game doesn't end nicely if you die
+
+## Fixed Bugs:
+
+<s>You get a 'Ouch! You walked into a wall' message when backtracking. This does not impede movement</s>

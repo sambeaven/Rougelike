@@ -35,12 +35,14 @@ namespace Rougelike.GameLogic
                         cell.DisplayCharacter = MAP_WALL;
                         cell.Passable = false;
                         cell.Transparent = false;
+                        cell.Unoccupied = true;
                     }
                     else
                     {
                         cell.DisplayCharacter = MAP_FLOOR;
                         cell.Passable = true;
                         cell.Transparent = true;
+                        cell.Unoccupied = true;
                     }
 
                     cell.X = x;
@@ -60,7 +62,7 @@ namespace Rougelike.GameLogic
 
             if (destCell != null)
             {
-                return destCell.Passable;
+                return destCell.Passable && destCell.Unoccupied;
             }
             return false;
         }

@@ -44,7 +44,7 @@ namespace Rougelike.GameLogic
                 if (agent.HitPoints <= 0)
                 {
                     messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.DarkYellow, agent.Name + " dies."));
-                    map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = true;
+                    map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
                 }
             }
 
@@ -141,12 +141,12 @@ namespace Rougelike.GameLogic
 
         private void DrawAgent(RLMap map, RLAgent agent, int x, int y)
         {
-            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = true;
+            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true; 
             Console.SetCursorPosition(x, y);
             agent.locationX = x;
             agent.locationY = y;
             Console.Write(agent.DisplayChar);
-            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Passable = false;
+            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = false;
         }
 
         private Tuple<int, int> moveRandom(RLAgent agent)
@@ -356,8 +356,7 @@ namespace Rougelike.GameLogic
                 if (map.isLocationPassable(playerDestinationX, playerDestinationY))
                 {
 
-                    hero.locationX = playerDestinationX;
-                    hero.locationY = playerDestinationY;
+                    DrawAgent(map, hero, playerDestinationX, playerDestinationY);
                 }
                 else if (destinationAgent != null)
                 {
@@ -366,16 +365,18 @@ namespace Rougelike.GameLogic
                     {
                         messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
                     }
+                    DrawAgent(map, hero, hero.locationX, hero.locationY);
                 }
                 else
                 {
                     messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall.");
+                    DrawAgent(map, hero, hero.locationX, hero.locationY);
                 }
 
                 
             } messages.Push(messageToAdd);
 
-            DrawAgent(map, hero, playerDestinationX, playerDestinationY);
+            
 
         }
 
