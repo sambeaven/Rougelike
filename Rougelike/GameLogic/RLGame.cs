@@ -16,7 +16,7 @@ namespace Rougelike.GameLogic
 
         private RLRenderer renderer;
 
-        private RLMap map;
+        public RLMap map;
 
         public RLGame()
         {
