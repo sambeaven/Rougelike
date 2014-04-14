@@ -24,7 +24,12 @@ namespace Rougelike.GameLogic
             renderer = new RLRenderer();
         }
 
-        public void TakeTurn(ConsoleKeyInfo cki)
+        /// <summary>
+        /// Evaluates a turn, handling movement and combat, and removes any dead agents.
+        /// </summary>
+        /// <param name="cki">A consolekeyinfo object representing the last button press</param>
+        /// <returns>a bool representing whether or not the game has ended. True means gameOver, false means the game will continue.</returns>
+        public bool TakeTurn(ConsoleKeyInfo cki)
         {
             renderer.DrawMap();
 
@@ -46,22 +51,22 @@ namespace Rougelike.GameLogic
             {
                 if (agent.HitPoints <= 0)
                 {
-                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.DarkYellow, agent.Name + " dies."));
+                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.DarkYellow, agent.Name + " died."));
                     map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
                 }
             }
-
-
-            agents.Where(a => a.HitPoints <= 0)
-                .ToList()
-                .ForEach(a => messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.DarkRed, a.Name + " died.")));
-
 
             agents = agents.Where(a => a.HitPoints > 0).ToList();
 
 
             renderer.PostMessages(messages);
 
+            if (agents.Where(a => a.GetType() == typeof(RLHero)).Count() == 0)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void PlaceAgent(RLMap map, RLAgent agent)
@@ -130,7 +135,7 @@ namespace Rougelike.GameLogic
         {
             Random randomDirection = new Random();
 
-            int direction = randomDirection.Next(1, 4);
+            int direction = randomDirection.Next(1, 5);
             int x = agent.locationX, y = agent.locationY;
 
             switch (direction)
@@ -326,28 +331,27 @@ namespace Rougelike.GameLogic
 
             var destinationAgent = agents.Where(a => a.locationX == playerDestinationX && a.locationY == playerDestinationY).FirstOrDefault();
 
-            if (cki.Key != ConsoleKey.Spacebar)
-            {
-                if (map.isLocationPassable(playerDestinationX, playerDestinationY))
-                {
 
-                    renderer.DrawAgent(map, hero, playerDestinationX, playerDestinationY);
-                }
-                else if (destinationAgent != null)
+            if (map.isLocationPassable(playerDestinationX, playerDestinationY))
+            {
+
+                renderer.DrawAgent(map, hero, playerDestinationX, playerDestinationY);
+            }
+            else if (destinationAgent != null)
+            {
+                var attackResults = destinationAgent.attackedBy(hero);
+                foreach (var attackMessage in attackResults)
                 {
-                    var attackResults = destinationAgent.attackedBy(hero);
-                    foreach (var attackMessage in attackResults)
-                    {
-                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
-                    }
-                    renderer.DrawAgent(map, hero, hero.locationX, hero.locationY);
+                    messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
                 }
-                else
-                {
-                    messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall.");
-                    renderer.DrawAgent(map, hero, hero.locationX, hero.locationY);
-                }
-            } messages.Push(messageToAdd);
+                renderer.DrawAgent(map, hero, hero.locationX, hero.locationY);
+            }
+            else
+            {
+                messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall.");
+                renderer.DrawAgent(map, hero, hero.locationX, hero.locationY);
+            }
+            messages.Push(messageToAdd);
         }
 
         internal void SetUp()
@@ -363,7 +367,8 @@ namespace Rougelike.GameLogic
                 strength: 50,
                 dexterity: 50,
                 name: "You",
-                constitution: 50
+                constitution: 50,
+                color: ConsoleColor.Green
                 );
 
             var monster1 = new GameLogic.RLMonster(
@@ -374,7 +379,8 @@ namespace Rougelike.GameLogic
                 strength: 25,
                 dexterity: 25,
                 name: "Goblin",
-                constitution: 25
+                constitution: 25,
+                color: ConsoleColor.DarkGreen
                 );
 
             var monster2 = new GameLogic.RLMonster(
@@ -385,8 +391,11 @@ namespace Rougelike.GameLogic
                 strength: 75,
                 dexterity: 75,
                 name: "Balrog",
-                constitution: 75
+                constitution: 75,
+                color: ConsoleColor.Red
                 );
+
+            monster2.monsterBehaviour = RLMonster.MonsterBehaviour.cowardly;
 
             agents.Add(hero);
             agents.Add(monster1);

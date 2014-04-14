@@ -13,6 +13,7 @@ namespace Rougelike.GameLogic
         public int locationY { get; set; }
         public char DisplayChar { get; set; }
 
+        public ConsoleColor DisplayColor { get; set; }
         public int HitPoints { get; set; }
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace Rougelike.GameLogic
         /// </summary>
         public int Constitution { get; set; }
 
-        public RLAgent(int locationX, int locationY, char displayChar, int hitPoints, int strength, int dexterity, string name, int constitution)
+        public RLAgent(int locationX, int locationY, char displayChar, int hitPoints, int strength, int dexterity, string name, int constitution, ConsoleColor color)
         {
             this.locationX = locationX;
             this.locationY = locationY;
@@ -40,6 +41,7 @@ namespace Rougelike.GameLogic
             this.Dexterity = dexterity;
             this.Name = name;
             this.Constitution = constitution;
+            this.DisplayColor = color;
         }
 
         /// <summary>

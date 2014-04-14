@@ -17,17 +17,18 @@ namespace Rougelike
             //turn this into a TakeInitialTurn method? Or Setup?
             //I could put all the above setup code in there as well (although it's not likely to stay there).
             ConsoleKeyInfo keyInfo = new ConsoleKeyInfo();
-
+            bool gameOver = false;
             //listen for input and handle moves
             do
             {
                 keyInfo = Console.ReadKey(true);
 
-                game.TakeTurn(keyInfo);
-            } while (keyInfo.Key != ConsoleKey.Escape);
+                gameOver = game.TakeTurn(keyInfo);
+            } while (!gameOver);
 
             //end game
-            //Console.ReadLine();
+            
+            Console.ReadLine();
         }
     }
 }

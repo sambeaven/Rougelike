@@ -6,7 +6,6 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 
 ## Current Todos:
 
-- Introduce looser coupling so that we can actually unit test this mother hubbard
 - Improve map system to make it a bit easier to customize dungeons for testing
 - Agent colours (i.e. colour for hero and for monsters)
 - Implement saving/loading

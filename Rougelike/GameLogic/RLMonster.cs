@@ -8,8 +8,8 @@ namespace Rougelike.GameLogic
 {
     public class RLMonster : RLAgent
     {
-        public RLMonster(int locationX, int locationY, char displayChar, int hitPoints, int strength, int dexterity, string name, int constitution)
-            : base(locationX, locationY, displayChar, hitPoints, strength, dexterity, name, constitution)
+        public RLMonster(int locationX, int locationY, char displayChar, int hitPoints, int strength, int dexterity, string name, int constitution, ConsoleColor color)
+            : base(locationX, locationY, displayChar, hitPoints, strength, dexterity, name, constitution, color)
         {
 
         }
