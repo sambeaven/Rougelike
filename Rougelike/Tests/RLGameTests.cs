@@ -18,5 +18,15 @@ namespace Rougelike.Tests
             Assert.IsNotNull(RLGame.messages);
             Assert.IsNotNull(RLGame.agents);
         }
+
+        [Test]
+        public void SetUpCreatesAgentsAndMap()
+        {
+            var RLGame = new GameLogic.RLGame();
+            RLGame.SetUp();
+
+            Assert.IsNotNull(RLGame.map);
+            Assert.IsTrue(RLGame.agents.Count() > 0);
+        }
     }
 }
