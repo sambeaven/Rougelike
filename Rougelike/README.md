@@ -12,5 +12,4 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 
 ## Known Bugs:
 
-
 - Monsters can get stuck next to each other

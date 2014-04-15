@@ -28,5 +28,28 @@ namespace Rougelike.Tests
             Assert.IsNotNull(RLGame.map);
             Assert.IsTrue(RLGame.agents.Count() > 0);
         }
+
+        [Test]
+        public void TakeTurnDoesNotMoveHeroWhenSpaceBarIsPassed()
+        {
+            var game = new GameLogic.RLGame();
+            game.SetUp();
+
+            var hero = game.agents.Where(a => a.GetType() == typeof(GameLogic.RLHero)).FirstOrDefault();
+
+            int initialX = hero.locationX;
+            int initialY = hero.locationY;
+
+            Assert.IsNotNull(hero);
+
+            game.TakeTurn(new ConsoleKeyInfo(keyChar:' ', key:ConsoleKey.Spacebar, shift:false, alt:false, control:false));
+
+            hero = game.agents.Where(a => a.GetType() == typeof(GameLogic.RLHero)).FirstOrDefault();
+
+            Assert.AreEqual(initialX, hero.locationX);
+            Assert.AreEqual(initialY, hero.locationY);
+        }
+
+
     }
 }
