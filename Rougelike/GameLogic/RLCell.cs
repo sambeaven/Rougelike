@@ -21,5 +21,13 @@ namespace Rougelike.GameLogic
         /// Refactor this? This feels like display logic that should really be somewhere else.
         /// </summary>
         public char DisplayCharacter { get; set; }
+
+        public List<RLItem> Items { get; set; }
+
+        public RLCell()
+        {
+            this.Items = new List<RLItem>();
+        }
+
     }
 }

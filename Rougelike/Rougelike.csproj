@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameLogic\Interfaces\IRLRenderer.cs" />
+    <Compile Include="GameLogic\RLItem.cs" />
     <Compile Include="GameLogic\RLMonster.cs" />
     <Compile Include="GameLogic\RLAgent.cs" />
     <Compile Include="GameLogic\RLCell.cs" />

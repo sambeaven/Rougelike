@@ -48,6 +48,11 @@ namespace Rougelike.GameLogic
                     cell.X = x;
                     cell.Y = y;
 
+                    if (x == 25 && y == 10)
+                    {
+                        cell.Items.Add(new RLItem() { DisplayChar = '%', DisplayColor = ConsoleColor.Yellow, Name = "Candlestick" });
+                    }
+
                     this.Add(cell);
                 }
             }

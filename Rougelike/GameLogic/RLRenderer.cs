@@ -48,7 +48,21 @@ namespace Rougelike.GameLogic
                 for (int y = 0; y < map.MaxHeight; y++)
                 {
                     Console.SetCursorPosition(x, y);
-                    Console.Write(map.Where(c => c.X == x && c.Y == y).FirstOrDefault().DisplayCharacter);
+                    char characterToDisplay = new char();
+                    ConsoleColor color;
+                    RLCell cell = map.Where(c => c.X == x && c.Y == y).FirstOrDefault();
+                    if (cell.Items.Count == 0)
+                    {
+                        characterToDisplay = cell.DisplayCharacter;
+                        color = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        characterToDisplay = cell.Items.First().DisplayChar;
+                        color = cell.Items.First().DisplayColor;
+                    }
+                    Console.ForegroundColor = color;
+                    Console.Write(characterToDisplay);
                 }
             }
             return map;
