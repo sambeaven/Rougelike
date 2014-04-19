@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Rougelike.GameLogic
 {
-    public class RLLevelGenerator
+    public class RLLevelGenerator : Interfaces.IRLLevelGenerator
     {
         public enum agentGeneratorBehaviour
         {
@@ -74,7 +74,7 @@ namespace Rougelike.GameLogic
 
         public RLMap GenerateMap()
         {
-            return new GameLogic.RLMap();
+            return new GameLogic.RLMap(GameLogic.RLMap.MapType.boxMap);
         }
     }
 }

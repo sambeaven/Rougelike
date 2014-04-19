@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rougelike.GameLogic.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,13 +19,20 @@ namespace Rougelike.GameLogic
 
         public RLMap map;
 
-        private RLLevelGenerator levelGenerator;
+        private IRLLevelGenerator levelGenerator;
 
         public RLGame()
         {
             messages = new Stack<Tuple<ConsoleColor, string>>();
             renderer = new RLRenderer();
             levelGenerator = new RLLevelGenerator();
+        }
+
+        public RLGame(RLRenderer renderer, Interfaces.IRLLevelGenerator levelGenerator)
+        {
+            messages = new Stack<Tuple<ConsoleColor, string>>();
+            this.renderer = renderer;
+            this.levelGenerator = levelGenerator;
         }
 
         /// <summary>
@@ -368,7 +376,7 @@ namespace Rougelike.GameLogic
             //  Once we get on to additional levels, we can call GenerateAgents with ExcludeHero set
 
 
-            map = levelGenerator.GenerateMap(); 
+            map = levelGenerator.GenerateMap();
 
             //draw dungeon
             renderer.DrawMap(map);

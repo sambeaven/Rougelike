@@ -8,15 +8,24 @@ namespace Rougelike.GameLogic
 {
     public class RLMap : List<RLCell>
     {
+        public enum MapType
+        {
+            boxMap,
+            emptyMap
+        }
+
 
         public const char MAP_WALL = '#';
         public const char MAP_FLOOR = '.';
 
-        public RLMap(int mapWidth = 50, int mapHeight = 20)
+        public RLMap(MapType mapType, int mapWidth = 50, int mapHeight = 20)
         {
             this.MaxHeight = mapHeight;
             this.MaxWidth = mapWidth;
-            GenerateBoxMap(mapWidth, mapHeight);
+            if (mapType == MapType.boxMap)
+            {
+                GenerateBoxMap(mapWidth, mapHeight);
+            }
         }
 
 
