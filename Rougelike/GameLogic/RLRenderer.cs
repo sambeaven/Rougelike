@@ -37,11 +37,10 @@ namespace Rougelike.GameLogic
             map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = false;
         }
 
-        public GameLogic.RLMap DrawMap()
+        public void DrawMap(RLMap map)
         {
             //Console.Clear();
             Console.ForegroundColor = ConsoleColor.White;
-            GameLogic.RLMap map = new GameLogic.RLMap();
 
             for (int x = 0; x < map.MaxWidth; x++)
             {
@@ -65,7 +64,6 @@ namespace Rougelike.GameLogic
                     Console.Write(characterToDisplay);
                 }
             }
-            return map;
         }
 
     }

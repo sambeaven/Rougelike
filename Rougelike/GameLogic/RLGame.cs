@@ -18,10 +18,13 @@ namespace Rougelike.GameLogic
 
         public RLMap map;
 
+        private RLLevelGenerator levelGenerator;
+
         public RLGame()
         {
             messages = new Stack<Tuple<ConsoleColor, string>>();
             renderer = new RLRenderer();
+            levelGenerator = new RLLevelGenerator();
         }
 
         /// <summary>
@@ -31,7 +34,7 @@ namespace Rougelike.GameLogic
         /// <returns>a bool representing whether or not the game has ended. True means gameOver, false means the game will continue.</returns>
         public bool TakeTurn(ConsoleKeyInfo cki)
         {
-            renderer.DrawMap();
+            renderer.DrawMap(map);
 
             //movement
             foreach (var agent in agents)
@@ -329,10 +332,14 @@ namespace Rougelike.GameLogic
                     break;
             }
 
-            var destinationAgent = agents.Where(a => a.locationX == playerDestinationX && a.locationY == playerDestinationY).FirstOrDefault();
+            var destinationAgent = agents
+                                    .Where(a => a.locationX == playerDestinationX && a.locationY == playerDestinationY)
+                                    .Where(a => a.GetType() != typeof(RLHero))
+                                    .FirstOrDefault();
 
 
-            if (map.isLocationPassable(playerDestinationX, playerDestinationY))
+            if (map.isLocationPassable(playerDestinationX, playerDestinationY)
+                || (hero.locationY == playerDestinationY && hero.locationX == playerDestinationX))
             {
 
                 renderer.DrawAgent(map, hero, playerDestinationX, playerDestinationY);
@@ -356,50 +363,18 @@ namespace Rougelike.GameLogic
 
         internal void SetUp()
         {
+            //map = levelGenerator.DrawMap
+            //agents = levelGenerator.GenerateAgents(agentGenerationBehaviour.IncludeHero)
+            //  Once we get on to additional levels, we can call GenerateAgents with ExcludeHero set
+
+
+            map = levelGenerator.GenerateMap(); 
+
             //draw dungeon
-            map = renderer.DrawMap();
+            renderer.DrawMap(map);
 
-            var hero = new GameLogic.RLHero(
-                locationX: 5,
-                locationY: 10,
-                displayChar: '@',
-                hitPoints: 200,
-                strength: 50,
-                dexterity: 50,
-                name: "You",
-                constitution: 50,
-                color: ConsoleColor.Green
-                );
+            agents = levelGenerator.GenerateAgents(RLLevelGenerator.agentGeneratorBehaviour.IncludeHero);
 
-            var monster1 = new GameLogic.RLMonster(
-                locationX: 10,
-                locationY: 10,
-                displayChar: 'g',
-                hitPoints: 200,
-                strength: 25,
-                dexterity: 25,
-                name: "Goblin",
-                constitution: 25,
-                color: ConsoleColor.DarkGreen
-                );
-
-            var monster2 = new GameLogic.RLMonster(
-                locationX: 10,
-                locationY: 15,
-                displayChar: 'X',
-                hitPoints: 200,
-                strength: 75,
-                dexterity: 75,
-                name: "Balrog",
-                constitution: 75,
-                color: ConsoleColor.Red
-                );
-
-            monster2.monsterBehaviour = RLMonster.MonsterBehaviour.cowardly;
-
-            agents.Add(hero);
-            agents.Add(monster1);
-            agents.Add(monster2);
             TakeTurn(new ConsoleKeyInfo());
         }
     }

@@ -10,6 +10,6 @@ namespace Rougelike.GameLogic.Interfaces
     {
         void PostMessages(Stack<Tuple<ConsoleColor, string>> messages);
         void DrawAgent(RLMap map, RLAgent agent, int x, int y);
-        GameLogic.RLMap DrawMap();
+        void DrawMap(RLMap map);
     }
 }
