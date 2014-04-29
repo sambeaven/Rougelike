@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Rougelike.GameLogic
 {
-    public class RLMap : List<RLCell>
+    public class RLMap : List<RLCell>, IEquatable<RLMap>
     {
         public enum MapType
         {
@@ -79,6 +79,19 @@ namespace Rougelike.GameLogic
                 return destCell.Passable && destCell.Unoccupied;
             }
             return false;
+        }
+
+        public bool Equals(RLMap other)
+        {
+            foreach (RLCell otherCell in other)
+            {
+                if (this.Where(c => c.Equals(otherCell)).Count() == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

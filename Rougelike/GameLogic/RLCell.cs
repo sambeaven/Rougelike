@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Rougelike.GameLogic
 {
-    public class RLCell
+    public class RLCell : IEquatable<RLCell>
     {
         public int X { get; set; }
         public int Y { get; set; }
@@ -29,5 +29,15 @@ namespace Rougelike.GameLogic
             this.Items = new List<RLItem>();
         }
 
+
+        public bool Equals(RLCell other)
+        {
+            return (other.X == this.X &&
+                    other.Y == this.Y &&
+                    other.Passable == this.Passable &&
+                    other.Unoccupied == this.Unoccupied &&
+                    other.Transparent == this.Transparent &&
+                    other.DisplayCharacter == this.DisplayCharacter);
+        }
     }
 }

@@ -80,6 +80,16 @@ namespace Rougelike.GameLogic
             return false;
         }
 
+        public bool SaveGame()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static RLGame LoadGame()
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlaceAgent(RLMap map, RLAgent agent)
         {
             if (agent.GetType() == typeof(RLMonster)) //always true at the moment, but might not be if I introduce NPCs.
