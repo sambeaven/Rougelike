@@ -88,7 +88,6 @@ namespace Rougelike.Tests
             //Map is the same
             Assert.AreEqual(savingGame.map.Count, loadingGame.map.Count);
 
-
             //Agents are the same
 
         }
