@@ -24,12 +24,15 @@ namespace Rougelike.Tests
         public void TwoUnequalMapsAreUnEqual()
         {
             var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
-            var map1 = levelGenerator.Object.GenerateMap();
-            var map2 = levelGenerator.Object.GenerateMap();
+            GameLogic.RLMap map1 = levelGenerator.Object.GenerateMap();
+            
+            levelGenerator = RLMapHelpers.GetMockLevelGenerator();
+            GameLogic.RLMap map2 = levelGenerator.Object.GenerateMap();
 
-            map2.First().Passable = !map2.First().Passable;
+            Assert.IsTrue(map1.First().Passable);
 
-            //Assert.AreNotEqual(game1.map, game2.map);
+            map2.First().Passable = false;
+
             Assert.IsFalse(map1.Equals(map2));
         }
 
