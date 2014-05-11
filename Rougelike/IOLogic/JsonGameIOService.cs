@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
+using System.Reflection;
 
 namespace Rougelike.IOLogic
 {
-    public class JsonGameIOService : IJsonGameIOService
+    public class JsonGameIOService : Interfaces.IJsonGameIOService
     {
         /// <summary>
         /// Takes a game and serializes it and all its children into a JSON text file
@@ -15,7 +18,26 @@ namespace Rougelike.IOLogic
         /// <returns>A bool indicating success or failure</returns>
         public bool SaveGame(GameLogic.RLGame game)
         {
-            throw new NotImplementedException();
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.NullValueHandling = NullValueHandling.Include;
+            
+            string sPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(sPath + "/save.txt"))
+                {
+                    using (JsonTextWriter writer = new JsonTextWriter(sw))
+                    {
+                        serializer.Serialize(sw, game);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

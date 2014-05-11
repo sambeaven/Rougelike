@@ -81,8 +81,8 @@
     <Compile Include="GameLogic\RLGame.cs" />
     <Compile Include="GameLogic\RLMap.cs" />
     <Compile Include="GameLogic\RLRenderer.cs" />
-    <Compile Include="IOLogic\IJsonGameSaverService.cs" />
-    <Compile Include="IOLogic\JsonGameSaverService.cs" />
+    <Compile Include="GameLogic\Interfaces\IJsonGameIOService.cs" />
+    <Compile Include="IOLogic\JsonGameIOService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\RLGameTests.cs" />

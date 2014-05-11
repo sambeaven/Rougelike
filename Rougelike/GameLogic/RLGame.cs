@@ -1,4 +1,6 @@
 ﻿using Rougelike.GameLogic.Interfaces;
+using Rougelike.Interfaces;
+using Rougelike.IOLogic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +23,8 @@ namespace Rougelike.GameLogic
 
         private IRLLevelGenerator levelGenerator;
 
+        private IJsonGameIOService ioService;
+
         public RLGame()
         {
             messages = new Stack<Tuple<ConsoleColor, string>>();
@@ -28,11 +32,12 @@ namespace Rougelike.GameLogic
             levelGenerator = new RLLevelGenerator();
         }
 
-        public RLGame(RLRenderer renderer, Interfaces.IRLLevelGenerator levelGenerator)
+        public RLGame(RLRenderer renderer, Interfaces.IRLLevelGenerator levelGenerator, IJsonGameIOService jsonService)
         {
             messages = new Stack<Tuple<ConsoleColor, string>>();
             this.renderer = renderer;
             this.levelGenerator = levelGenerator;
+            this.ioService = jsonService;
         }
 
         /// <summary>
@@ -82,7 +87,7 @@ namespace Rougelike.GameLogic
 
         public bool SaveGame()
         {
-            throw new NotImplementedException();
+            return ioService.SaveGame(this);
         }
 
         public static RLGame LoadGame()
