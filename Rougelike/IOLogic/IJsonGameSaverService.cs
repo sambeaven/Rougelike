@@ -7,7 +7,7 @@ namespace Rougelike.IOLogic
 {
     interface IJsonGameIOService
     {
-        void SaveGame(GameLogic.RLGame game);
+        bool SaveGame(GameLogic.RLGame game);
 
         GameLogic.RLGame LoadGame();
     }

@@ -89,7 +89,11 @@ namespace Rougelike.Tests
             Assert.AreEqual(savingGame.map.Count, loadingGame.map.Count);
 
             //Agents are the same
-
+            Assert.AreEqual(savingGame.agents.Count, loadingGame.agents.Count);
+            foreach (var savedAgent in savingGame.agents)
+            {
+                Assert.IsTrue(loadingGame.agents.Contains(savedAgent), "loaded game does not contain the agent " + savedAgent.Name);
+            }
         }
 
 
