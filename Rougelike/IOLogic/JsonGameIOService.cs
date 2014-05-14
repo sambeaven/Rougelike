@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -46,7 +42,25 @@ namespace Rougelike.IOLogic
         /// <returns>A game based on the contents of the savegame file</returns>
         public GameLogic.RLGame LoadGame()
         {
-            throw new NotImplementedException();
+
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.NullValueHandling = NullValueHandling.Include;
+            
+            string sPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            try
+            {
+                using (StreamReader reader = File.OpenText(sPath + "/save.txt"))
+                {
+                    return (GameLogic.RLGame)serializer.Deserialize(reader, typeof(GameLogic.RLGame));
+                }
+            }
+            catch (Exception ex)
+            {
+                //Some sort of friendly message?
+                return null;
+            }
+            
         }
     }
 }

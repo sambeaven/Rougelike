@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Rougelike.GameLogic
 {
-    public class RLMap : List<RLCell>, IEquatable<RLMap>
+    public class RLMap : IEquatable<RLMap>
     {
         public enum MapType
         {
@@ -20,16 +20,33 @@ namespace Rougelike.GameLogic
         public const char MAP_WALL = '#';
         public const char MAP_FLOOR = '.';
 
-        public RLMap(MapType mapType, int mapWidth = 50, int mapHeight = 20)
+        [JsonConstructor]
+        public RLMap(MapType mapType, int mapWidth = 50, int mapHeight = 20, List<RLCell> cells = null)
         {
             this.MaxHeight = mapHeight;
             this.MaxWidth = mapWidth;
+            if (cells != null)
+            {
+                this.Cells = cells;
+            }
+            else
+            {
+                this.Cells = new List<RLCell>();
+            }
+
             if (mapType == MapType.boxMap)
             {
                 GenerateBoxMap(mapWidth, mapHeight);
             }
+
         }
 
+        public RLMap(List<RLCell> cells)
+        {
+            this.Cells = cells;
+        }
+
+        public List<RLCell> Cells { get; set; }
 
         private void GenerateBoxMap(int mapWidth, int mapHeight)
         {
@@ -64,7 +81,7 @@ namespace Rougelike.GameLogic
                         cell.Items.Add(new RLItem() { DisplayChar = '%', DisplayColor = ConsoleColor.Yellow, Name = "Candlestick" });
                     }
 
-                    this.Add(cell);
+                    this.Cells.Add(cell);
                 }
             }
         }
@@ -74,7 +91,7 @@ namespace Rougelike.GameLogic
 
         public bool isLocationPassable(int x, int y)
         {
-            var destCell = this.Where(c => c.X == x && c.Y == y).FirstOrDefault();
+            var destCell = this.Cells.Where(c => c.X == x && c.Y == y).FirstOrDefault();
 
             if (destCell != null)
             {
@@ -85,9 +102,9 @@ namespace Rougelike.GameLogic
 
         public bool Equals(RLMap other)
         {
-            foreach (RLCell otherCell in other)
+            foreach (RLCell otherCell in other.Cells)
             {
-                if (this.Where(c => c.Equals(otherCell)).Count() == 0)
+                if (this.Cells.Where(c => c.Equals(otherCell)).Count() == 0)
                 {
                     return false;
                 }

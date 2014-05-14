@@ -29,9 +29,9 @@ namespace Rougelike.Tests
             levelGenerator = RLMapHelpers.GetMockLevelGenerator();
             GameLogic.RLMap map2 = levelGenerator.Object.GenerateMap();
 
-            Assert.IsTrue(map1.First().Passable);
+            Assert.IsTrue(map1.Cells.First().Passable);
 
-            map2.First().Passable = false;
+            map2.Cells.First().Passable = false;
 
             Assert.IsFalse(map1.Equals(map2));
         }

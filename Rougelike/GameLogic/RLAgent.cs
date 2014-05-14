@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Rougelike.GameLogic
 {
-    public class RLAgent
+    public class RLAgent : IEquatable<RLAgent>
     {
         public string Name { get; set; }
         public int locationX { get; set; }
@@ -19,13 +19,13 @@ namespace Rougelike.GameLogic
         /// <summary>
         /// Used to determine damage. 1-100
         /// </summary>
-        
+
         public int Strength { get; set; }
         /// <summary>
         /// used to determine initiative and hit rolls. 1-100
         /// </summary>
         public int Dexterity { get; set; }
-        
+
         /// <summary>
         /// Used to determine defense. 1-100
         /// </summary>
@@ -88,6 +88,20 @@ namespace Rougelike.GameLogic
             }
 
             return messages;
+        }
+
+        public bool Equals(RLAgent other)
+        {
+            return (
+                this.Name           == other.Name           &&
+                this.locationX      == other.locationX      &&
+                this.locationY      == other.locationY      &&
+                this.DisplayChar    == other.DisplayChar    &&
+                this.DisplayColor   == other.DisplayColor   &&
+                this.HitPoints      == other.HitPoints      &&
+                this.Strength       == other.Strength       &&
+                this.Dexterity      == other.Dexterity      &&
+                this.Constitution   == other.Constitution);
         }
     }
 }

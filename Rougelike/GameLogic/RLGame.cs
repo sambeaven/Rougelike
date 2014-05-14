@@ -1,4 +1,5 @@
-﻿using Rougelike.GameLogic.Interfaces;
+﻿using Newtonsoft.Json;
+using Rougelike.GameLogic.Interfaces;
 using Rougelike.Interfaces;
 using Rougelike.IOLogic;
 using System;
@@ -40,6 +41,18 @@ namespace Rougelike.GameLogic
             this.ioService = jsonService;
         }
 
+        [JsonConstructor]
+        public RLGame(RLRenderer renderer, Interfaces.IRLLevelGenerator levelGenerator, IJsonGameIOService jsonService, RLMap map, List<RLAgent> agents,
+            Stack<Tuple<ConsoleColor, string>> messages)
+        {
+            this.renderer = renderer;
+            this.levelGenerator = levelGenerator;
+            this.ioService = jsonService;
+            this.map = map;
+            this.agents = agents;
+            this.messages = messages;
+        }
+
         /// <summary>
         /// Evaluates a turn, handling movement and combat, and removes any dead agents.
         /// </summary>
@@ -68,7 +81,7 @@ namespace Rougelike.GameLogic
                 if (agent.HitPoints <= 0)
                 {
                     messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.DarkYellow, agent.Name + " died."));
-                    map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
+                    map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
                 }
             }
 
@@ -90,9 +103,9 @@ namespace Rougelike.GameLogic
             return ioService.SaveGame(this);
         }
 
-        public static RLGame LoadGame()
+        public static RLGame LoadGame(IJsonGameIOService ioService)
         {
-            throw new NotImplementedException();
+            return ioService.LoadGame();
         }
 
         private void PlaceAgent(RLMap map, RLAgent agent)
@@ -310,7 +323,7 @@ namespace Rougelike.GameLogic
                 checkX = (checkX != second.locationX) ? moveTowardsX(checkX) : checkX;
                 checkY = (checkY != second.locationY) ? moveTowardsY(checkY) : checkY;
 
-                var cellToCheck = map.Where(c => c.X == checkX && c.Y == checkY).FirstOrDefault();
+                var cellToCheck = map.Cells.Where(c => c.X == checkX && c.Y == checkY).FirstOrDefault();
 
                 if (!cellToCheck.Transparent)
                 {

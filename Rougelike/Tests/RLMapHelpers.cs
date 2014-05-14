@@ -11,7 +11,7 @@ namespace Rougelike.Tests
             var levelGenerator = new Mock<GameLogic.Interfaces.IRLLevelGenerator>();
 
             levelGenerator.Setup(l => l.GenerateMap())
-                .Returns(new GameLogic.RLMap(GameLogic.RLMap.MapType.emptyMap, mapHeight: 3, mapWidth: 3){
+                .Returns(new GameLogic.RLMap(GameLogic.RLMap.MapType.emptyMap, mapHeight: 3, mapWidth: 3, cells: new List<GameLogic.RLCell>(){
                     new GameLogic.RLCell() { X = 0, Y = 0, Passable=true, Unoccupied=true},
                     new GameLogic.RLCell() { X = 1, Y = 0, Passable=true, Unoccupied=true},
                     new GameLogic.RLCell() { X = 2, Y = 0, Passable=true, Unoccupied=true},
@@ -21,7 +21,7 @@ namespace Rougelike.Tests
                     new GameLogic.RLCell() { X = 0, Y = 2, Passable=true, Unoccupied=true},
                     new GameLogic.RLCell() { X = 1, Y = 2, Passable=true, Unoccupied=true},
                     new GameLogic.RLCell() { X = 2, Y = 2, Passable=true, Unoccupied=true}
-                });
+                }));
 
             levelGenerator.Setup(l => l.GenerateAgents(GameLogic.RLLevelGenerator.agentGeneratorBehaviour.IncludeHero))
                 .Returns(new List<GameLogic.RLAgent>(){

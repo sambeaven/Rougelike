@@ -83,10 +83,10 @@ namespace Rougelike.Tests
 
             savingGame.SaveGame();
 
-            var loadingGame = GameLogic.RLGame.LoadGame();
+            var loadingGame = GameLogic.RLGame.LoadGame(new IOLogic.JsonGameIOService());
 
             //Map is the same
-            Assert.AreEqual(savingGame.map.Count, loadingGame.map.Count);
+            Assert.AreEqual(savingGame.map.Cells.Count, loadingGame.map.Cells.Count);
 
             //Agents are the same
             Assert.AreEqual(savingGame.agents.Count, loadingGame.agents.Count);

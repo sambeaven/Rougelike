@@ -27,14 +27,14 @@ namespace Rougelike.GameLogic
 
         public void DrawAgent(RLMap map, RLAgent agent, int x, int y)
         {
-            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
+            map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
             Console.SetCursorPosition(x, y);
             Console.ForegroundColor = agent.DisplayColor;
             agent.locationX = x;
             agent.locationY = y;
             Console.Write(agent.DisplayChar);
             Console.ForegroundColor = ConsoleColor.White;
-            map.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = false;
+            map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = false;
         }
 
         public void DrawMap(RLMap map)
@@ -49,7 +49,7 @@ namespace Rougelike.GameLogic
                     Console.SetCursorPosition(x, y);
                     char characterToDisplay = new char();
                     ConsoleColor color;
-                    RLCell cell = map.Where(c => c.X == x && c.Y == y).FirstOrDefault();
+                    RLCell cell = map.Cells.Where(c => c.X == x && c.Y == y).FirstOrDefault();
                     if (cell.Items.Count == 0)
                     {
                         characterToDisplay = cell.DisplayCharacter;
