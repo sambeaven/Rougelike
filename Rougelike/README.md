@@ -7,6 +7,7 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 ## Current Todos:
 
 - Implement saving/loading
+- Doors
 - Fog of war
 - Items and Equipment
 - Random dungeon generation
@@ -15,7 +16,7 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 - Time (certain actions take more time than others)
 - Give monsters a sense of object permanence (as in, able to follow the player when they can't see them)
 - Patrolling monsters
-- Hunger
+- Crafting
 
 ## Known Bugs:
 
