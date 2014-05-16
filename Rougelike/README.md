@@ -7,9 +7,7 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 ## Current Todos:
 
 - Implement saving/loading
-    - I'm thinking we can save to some JSON objects and stick those in a text file
-    - This has the added benefit of being easy to edit and view
-    - Technically: we could either use JSON.net or a plain old DataContractJsonSerializer. I'm thinking the latter, just because it's already in the framework and speed isn't a concern.
+- Fog of war
 - Items and Equipment
 - Random dungeon generation
 - Random monster generation
