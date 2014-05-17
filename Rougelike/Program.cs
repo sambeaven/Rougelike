@@ -23,7 +23,7 @@ namespace Rougelike
             {
                 keyInfo = Console.ReadKey(true);
 
-                gameOver = game.TakeTurn(keyInfo);
+                gameOver = game.ProcessInput(keyInfo);
             } while (!gameOver);
 
             //end game

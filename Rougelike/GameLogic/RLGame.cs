@@ -26,31 +26,29 @@ namespace Rougelike.GameLogic
 
         private IJsonGameIOService ioService;
 
+        private RLPlayerActionsService playerActionsService;
+
         public RLGame()
         {
             messages = new Stack<Tuple<ConsoleColor, string>>();
             renderer = new RLRenderer();
             levelGenerator = new RLLevelGenerator();
-        }
-
-        public RLGame(RLRenderer renderer, Interfaces.IRLLevelGenerator levelGenerator, IJsonGameIOService jsonService)
-        {
-            messages = new Stack<Tuple<ConsoleColor, string>>();
-            this.renderer = renderer;
-            this.levelGenerator = levelGenerator;
-            this.ioService = jsonService;
+            playerActionsService = new RLPlayerActionsService();
         }
 
         [JsonConstructor]
-        public RLGame(RLRenderer renderer, Interfaces.IRLLevelGenerator levelGenerator, IJsonGameIOService jsonService, RLMap map, List<RLAgent> agents,
-            Stack<Tuple<ConsoleColor, string>> messages)
+        public RLGame(RLRenderer renderer = null, Interfaces.IRLLevelGenerator levelGenerator = null,
+            IJsonGameIOService jsonService = null, RLMap map = null, List<RLAgent> agents = null,
+            Stack<Tuple<ConsoleColor, string>> messages = null, RLPlayerActionsService playerActionsService = null)
         {
-            this.renderer = renderer;
-            this.levelGenerator = levelGenerator;
-            this.ioService = jsonService;
+
+            this.renderer = renderer != null ? renderer : new RLRenderer();
+            this.levelGenerator = levelGenerator != null ? levelGenerator : new RLLevelGenerator();
+            this.ioService = jsonService != null ? jsonService : new JsonGameIOService();
             this.map = map;
-            this.agents = agents;
-            this.messages = messages;
+            this.agents = agents != null ? agents : new List<RLAgent>();
+            this.messages = messages != null ? messages : new Stack<Tuple<ConsoleColor, string>>();
+            this.playerActionsService = playerActionsService != null ? playerActionsService : new RLPlayerActionsService();
         }
 
         /// <summary>
@@ -58,7 +56,7 @@ namespace Rougelike.GameLogic
         /// </summary>
         /// <param name="cki">A consolekeyinfo object representing the last button press</param>
         /// <returns>a bool representing whether or not the game has ended. True means gameOver, false means the game will continue.</returns>
-        public bool TakeTurn(ConsoleKeyInfo cki)
+        public bool ProcessInput(ConsoleKeyInfo cki)
         {
             renderer.DrawMap(map);
 
@@ -342,27 +340,38 @@ namespace Rougelike.GameLogic
             playerDestinationY = hero.locationY;
 
             var messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.White, "");
+            var playerInput = playerActionsService.GetActionFromInput(cki);
 
-            switch (cki.Key)
+            switch (playerInput)
             {
-                case ConsoleKey.UpArrow:
+                case RLPlayerAction.EmptyAction:
+                    break;
+                case RLPlayerAction.MoveUp:
                     playerDestinationY = hero.locationY - 1;
                     messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step north");
                     break;
-                case ConsoleKey.DownArrow:
+                case RLPlayerAction.MoveDown:
                     playerDestinationY = hero.locationY + 1;
                     messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step south");
                     break;
-                case ConsoleKey.LeftArrow:
+                case RLPlayerAction.MoveLeft:
                     playerDestinationX = hero.locationX - 1;
                     messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step west");
                     break;
-                case ConsoleKey.RightArrow:
+                case RLPlayerAction.MoveRight:
                     playerDestinationX = hero.locationX + 1;
                     messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Green, "You step east");
                     break;
-                case ConsoleKey.Spacebar:
+                case RLPlayerAction.Wait:
                     messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Cyan, "You wait");
+                    break;
+                case RLPlayerAction.Save:
+                    SaveGame();
+                    break;
+                case RLPlayerAction.Load:
+                    //TODO: Figure out how to implement this!
+                    //  Is there a wrapper object around game that can replace this?
+                    //  Does Game run inside another object?
                     break;
                 default:
                     break;
@@ -411,7 +420,7 @@ namespace Rougelike.GameLogic
 
             agents = levelGenerator.GenerateAgents(RLLevelGenerator.agentGeneratorBehaviour.IncludeHero);
 
-            TakeTurn(new ConsoleKeyInfo());
+            ProcessInput(new ConsoleKeyInfo(' ', ConsoleKey.Spacebar, false, false, false));
         }
     }
 }

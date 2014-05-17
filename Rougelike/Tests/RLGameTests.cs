@@ -50,7 +50,7 @@ namespace Rougelike.Tests
 
             var ConsoleKeyInfo = new ConsoleKeyInfo(keyChar: ' ', key: keyToPass, shift: false, alt: false, control: false);
 
-            game.TakeTurn(ConsoleKeyInfo);
+            game.ProcessInput(ConsoleKeyInfo);
 
             var hero = GetHero(game);
 
@@ -77,7 +77,7 @@ namespace Rougelike.Tests
 
             var ConsoleKeyInfo = new ConsoleKeyInfo(keyChar: ' ', key: ConsoleKey.UpArrow, shift: false, alt: false, control: false);
 
-            savingGame.TakeTurn(ConsoleKeyInfo);
+            savingGame.ProcessInput(ConsoleKeyInfo);
 
             var hero = GetHero(savingGame);
 

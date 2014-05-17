@@ -79,6 +79,7 @@
     <Compile Include="GameLogic\RLHero.cs" />
     <Compile Include="GameLogic\RLGame.cs" />
     <Compile Include="GameLogic\RLMap.cs" />
+    <Compile Include="GameLogic\RLPlayerActions.cs" />
     <Compile Include="GameLogic\RLRenderer.cs" />
     <Compile Include="GameLogic\Interfaces\IJsonGameIOService.cs" />
     <Compile Include="IOLogic\JsonGameIOService.cs" />
