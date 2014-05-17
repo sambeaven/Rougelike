@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="GameLogic\Interfaces\IRLLevelGenerator.cs" />
     <Compile Include="GameLogic\Interfaces\IRLRenderer.cs" />
+    <Compile Include="GameLogic\RLAIService.cs" />
     <Compile Include="GameLogic\RLItem.cs" />
     <Compile Include="GameLogic\RLLevelGenerator.cs" />
     <Compile Include="GameLogic\RLMonster.cs" />

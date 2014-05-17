@@ -28,6 +28,8 @@ namespace Rougelike.GameLogic
 
         private RLPlayerActionsService playerActionsService;
 
+        private RLAIService aiService;
+
         public RLGame()
         {
             messages = new Stack<Tuple<ConsoleColor, string>>();
@@ -39,7 +41,8 @@ namespace Rougelike.GameLogic
         [JsonConstructor]
         public RLGame(RLRenderer renderer = null, Interfaces.IRLLevelGenerator levelGenerator = null,
             IJsonGameIOService jsonService = null, RLMap map = null, List<RLAgent> agents = null,
-            Stack<Tuple<ConsoleColor, string>> messages = null, RLPlayerActionsService playerActionsService = null)
+            Stack<Tuple<ConsoleColor, string>> messages = null, RLPlayerActionsService playerActionsService = null,
+            RLAIService aiService = null)
         {
 
             this.renderer = renderer != null ? renderer : new RLRenderer();
@@ -49,6 +52,7 @@ namespace Rougelike.GameLogic
             this.agents = agents != null ? agents : new List<RLAgent>();
             this.messages = messages != null ? messages : new Stack<Tuple<ConsoleColor, string>>();
             this.playerActionsService = playerActionsService != null ? playerActionsService : new RLPlayerActionsService();
+            this.aiService = aiService != null ? aiService : new RLAIService();
         }
 
         /// <summary>
@@ -116,7 +120,7 @@ namespace Rougelike.GameLogic
                 Tuple<int, int> destination = null;
 
                 //if monster can see hero, move according to monster behaviour
-                if (CanSeeEachOther(agent, hero, map))
+                if (aiService.CanSeeEachOther(agent, hero, map))
                 {
 
 
@@ -124,13 +128,13 @@ namespace Rougelike.GameLogic
                     switch (monster.monsterBehaviour)
                     {
                         case RLMonster.MonsterBehaviour.aggressive:
-                            destination = moveTowards(monster, hero);
+                            destination = aiService.moveTowards(monster, hero);
                             break;
                         case RLMonster.MonsterBehaviour.passive:
-                            destination = moveRandom(monster);
+                            destination = aiService.moveRandom(monster);
                             break;
                         case RLMonster.MonsterBehaviour.cowardly:
-                            destination = moveAway(monster, hero);
+                            destination = aiService.moveAway(monster, hero);
                             break;
                         default:
                             break;
@@ -138,7 +142,7 @@ namespace Rougelike.GameLogic
                 }
                 else //otherwise, move at random
                 {
-                    destination = moveRandom(monster);
+                    destination = aiService.moveRandom(monster);
 
                 }
 
@@ -166,170 +170,6 @@ namespace Rougelike.GameLogic
                     }
                 }
             }
-        }
-
-        private Tuple<int, int> moveRandom(RLAgent agent)
-        {
-            Random randomDirection = new Random();
-
-            int direction = randomDirection.Next(1, 5);
-            int x = agent.locationX, y = agent.locationY;
-
-            switch (direction)
-            {
-                case 1:
-                    //north
-                    y = agent.locationY - 1;
-                    break;
-                case 2:
-                    //south
-                    y = agent.locationY + 1;
-                    break;
-                case 3:
-                    //east
-                    x = agent.locationX - 1;
-                    break;
-                case 4:
-                    //west
-                    x = agent.locationX + 1;
-                    break;
-                default:
-                    break;
-            }
-
-            return new Tuple<int, int>(x, y);
-        }
-
-        private Tuple<int, int> moveAway(RLMonster monster, RLHero hero)
-        {
-            //work out differences to find the axis with the greatest difference. We'll move along that axis.
-
-            int x = monster.locationX, y = monster.locationY;
-
-            int xDiff = monster.locationX - hero.locationX;
-            int yDiff = monster.locationY - hero.locationY;
-
-            if (xDiff < 0)
-            {
-                xDiff = xDiff * -1;
-            }
-
-            if (yDiff < 0)
-            {
-                yDiff = yDiff * -1;
-            }
-
-            if (xDiff >= yDiff)
-            {
-                if (hero.locationX > monster.locationX)
-                {
-                    x--;
-                }
-                else
-                {
-                    x++;
-                }
-            }
-            else
-            {
-                if (hero.locationY > monster.locationY)
-                {
-                    y--;
-                }
-                else
-                {
-                    y++;
-                }
-            }
-
-            return new Tuple<int, int>(x, y);
-        }
-
-        private Tuple<int, int> moveTowards(RLMonster monster, RLHero hero)
-        {
-            //work out differences to find the axis with the greatest difference. We'll move along that axis.
-
-            int x = monster.locationX, y = monster.locationY;
-
-            int xDiff = monster.locationX - hero.locationX;
-            int yDiff = monster.locationY - hero.locationY;
-
-            if (xDiff < 0)
-            {
-                xDiff = xDiff * -1;
-            }
-
-            if (yDiff < 0)
-            {
-                yDiff = yDiff * -1;
-            }
-
-            if (xDiff >= yDiff)
-            {
-                if (hero.locationX > monster.locationX)
-                {
-                    x++;
-                }
-                else
-                {
-                    x--;
-                }
-            }
-            else
-            {
-                if (hero.locationY > monster.locationY)
-                {
-                    y++;
-                }
-                else
-                {
-                    y--;
-                }
-            }
-
-            return new Tuple<int, int>(x, y);
-        }
-
-        private bool CanSeeEachOther(RLAgent first, RLAgent second, RLMap map)
-        {
-            Func<int, int> moveTowardsX = null;
-            Func<int, int> moveTowardsY = null;
-
-            if (first.locationX > second.locationX)
-            {
-                moveTowardsX = x => x - 1;
-            }
-            else
-            {
-                moveTowardsX = x => x + 1;
-            }
-
-            if (first.locationY > second.locationY)
-            {
-                moveTowardsY = y => y - 1;
-            }
-            else
-            {
-                moveTowardsY = y => y + 1;
-            }
-
-            int checkX = first.locationX;
-            int checkY = first.locationY;
-
-            do
-            {
-                checkX = (checkX != second.locationX) ? moveTowardsX(checkX) : checkX;
-                checkY = (checkY != second.locationY) ? moveTowardsY(checkY) : checkY;
-
-                var cellToCheck = map.Cells.Where(c => c.X == checkX && c.Y == checkY).FirstOrDefault();
-
-                if (!cellToCheck.Transparent)
-                {
-                    return false;
-                }
-            } while (second.locationX != checkX || second.locationY != checkY);
-
-            return true;
         }
 
         private void PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, ConsoleKeyInfo cki)
