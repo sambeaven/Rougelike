@@ -8,7 +8,8 @@ namespace Rougelike.GameLogic.Interfaces
 {
     public interface IRLLevelGenerator
     {
-        List<RLAgent> GenerateAgents(Rougelike.GameLogic.RLLevelGenerator.agentGeneratorBehaviour generatorBehaviour);
+        List<RLMonster> GenerateMonsters();
         RLMap GenerateMap();
+        RLHero GetDefaultHero();
     }
 }

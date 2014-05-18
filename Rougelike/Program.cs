@@ -22,8 +22,10 @@ namespace Rougelike
             do
             {
                 keyInfo = Console.ReadKey(true);
+                var gameAction = game.playerActionsService.GetActionFromInput(keyInfo);
 
-                gameOver = game.ProcessInput(keyInfo);
+
+                gameOver = game.ProcessInput(gameAction);
             } while (!gameOver);
 
             //end game

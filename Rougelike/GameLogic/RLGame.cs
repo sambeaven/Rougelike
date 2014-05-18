@@ -16,7 +16,7 @@ namespace Rougelike.GameLogic
 
         public Stack<Tuple<ConsoleColor, string>> messages { get; set; }
 
-        public List<RLAgent> agents = new List<RLAgent>();
+        public List<RLMonster> monsters = new List<RLMonster>();
 
         private RLRenderer renderer;
 
@@ -26,33 +26,28 @@ namespace Rougelike.GameLogic
 
         private IJsonGameIOService ioService;
 
-        private RLPlayerActionsService playerActionsService;
+        public RLPlayerActionsService playerActionsService;
 
         private RLAIService aiService;
 
-        public RLGame()
-        {
-            messages = new Stack<Tuple<ConsoleColor, string>>();
-            renderer = new RLRenderer();
-            levelGenerator = new RLLevelGenerator();
-            playerActionsService = new RLPlayerActionsService();
-        }
+        public RLHero hero;
 
         [JsonConstructor]
         public RLGame(RLRenderer renderer = null, Interfaces.IRLLevelGenerator levelGenerator = null,
-            IJsonGameIOService jsonService = null, RLMap map = null, List<RLAgent> agents = null,
+            IJsonGameIOService jsonService = null, RLMap map = null, List<RLMonster> monsters = null,
             Stack<Tuple<ConsoleColor, string>> messages = null, RLPlayerActionsService playerActionsService = null,
-            RLAIService aiService = null)
+            RLAIService aiService = null, RLHero hero = null)
         {
 
             this.renderer = renderer != null ? renderer : new RLRenderer();
             this.levelGenerator = levelGenerator != null ? levelGenerator : new RLLevelGenerator();
             this.ioService = jsonService != null ? jsonService : new JsonGameIOService();
             this.map = map;
-            this.agents = agents != null ? agents : new List<RLAgent>();
+            this.monsters = monsters != null ? monsters : new List<RLMonster>();
             this.messages = messages != null ? messages : new Stack<Tuple<ConsoleColor, string>>();
             this.playerActionsService = playerActionsService != null ? playerActionsService : new RLPlayerActionsService();
             this.aiService = aiService != null ? aiService : new RLAIService();
+            this.hero = hero != null ? hero : this.levelGenerator.GetDefaultHero();
         }
 
         /// <summary>
@@ -60,25 +55,19 @@ namespace Rougelike.GameLogic
         /// </summary>
         /// <param name="cki">A consolekeyinfo object representing the last button press</param>
         /// <returns>a bool representing whether or not the game has ended. True means gameOver, false means the game will continue.</returns>
-        public bool ProcessInput(ConsoleKeyInfo cki)
+        public bool ProcessInput(RLPlayerAction action)
         {
             renderer.DrawMap(map);
 
             //movement
-            foreach (var agent in agents)
+            PlacePlayer(map, action);
+            foreach (var agent in monsters)
             {
-                if (agent.GetType() == typeof(RLHero))
-                {
-                    PlacePlayer(map, agent, cki);
-                }
-                else
-                {
-                    PlaceAgent(map, agent);
-                }
+                PlaceMonster(map, agent);
             }
 
             //remove dead agents
-            foreach (var agent in agents)
+            foreach (var agent in monsters)
             {
                 if (agent.HitPoints <= 0)
                 {
@@ -87,16 +76,15 @@ namespace Rougelike.GameLogic
                 }
             }
 
-            agents = agents.Where(a => a.HitPoints > 0).ToList();
+            monsters = monsters.Where(a => a.HitPoints > 0).ToList();
 
 
             renderer.PostMessages(messages);
 
-            if (agents.Where(a => a.GetType() == typeof(RLHero)).Count() == 0)
+            if (hero.HitPoints == 0)
             {
                 return true;
             }
-
             return false;
         }
 
@@ -105,74 +93,74 @@ namespace Rougelike.GameLogic
             return ioService.SaveGame(this);
         }
 
-        public static RLGame LoadGame(IJsonGameIOService ioService)
+        public void LoadGame()
         {
-            return ioService.LoadGame();
+            var loadedGame = ioService.LoadGame();
+            this.map = loadedGame.map;
+            this.levelGenerator = loadedGame.levelGenerator;
+            this.messages = loadedGame.messages;
+            this.renderer = loadedGame.renderer;
+            this.ioService = loadedGame.ioService;
+            this.monsters = loadedGame.monsters;
+            this.messages = loadedGame.messages;
+            this.playerActionsService = loadedGame.playerActionsService;
+            this.aiService = loadedGame.aiService;
+            this.hero = loadedGame.hero;
         }
 
-        private void PlaceAgent(RLMap map, RLAgent agent)
+        private void PlaceMonster(RLMap map, RLMonster monster)
         {
-            if (agent.GetType() == typeof(RLMonster)) //always true at the moment, but might not be if I introduce NPCs.
+            Tuple<int, int> destination = null;
+
+            //if monster can see hero, move according to monster behaviour
+            if (aiService.CanSeeEachOther(monster, hero, map))
             {
-                var monster = (RLMonster)agent;
-                var hero = (RLHero)agents.Where(a => a.GetType() == typeof(RLHero)).First();
-
-                Tuple<int, int> destination = null;
-
-                //if monster can see hero, move according to monster behaviour
-                if (aiService.CanSeeEachOther(agent, hero, map))
+                switch (monster.monsterBehaviour)
                 {
+                    case RLMonster.MonsterBehaviour.aggressive:
+                        destination = aiService.moveTowards(monster, hero);
+                        break;
+                    case RLMonster.MonsterBehaviour.passive:
+                        destination = aiService.moveRandom(monster);
+                        break;
+                    case RLMonster.MonsterBehaviour.cowardly:
+                        destination = aiService.moveAway(monster, hero);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else //otherwise, move at random
+            {
+                destination = aiService.moveRandom(monster);
+            }
 
-
-                    //messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, agent.Name + " can see " + hero.Name + "!"));
-                    switch (monster.monsterBehaviour)
+            if (destination != null)
+            {
+                if (destination.Item1 == hero.locationX && destination.Item2 == hero.locationY)
+                {
+                    //redraw in the same location
+                    renderer.DrawAgent(map, monster, monster.locationX, monster.locationY);
+                    //attack hero
+                    var attackResults = hero.attackedBy(monster);
+                    foreach (var attackMessage in attackResults)
                     {
-                        case RLMonster.MonsterBehaviour.aggressive:
-                            destination = aiService.moveTowards(monster, hero);
-                            break;
-                        case RLMonster.MonsterBehaviour.passive:
-                            destination = aiService.moveRandom(monster);
-                            break;
-                        case RLMonster.MonsterBehaviour.cowardly:
-                            destination = aiService.moveAway(monster, hero);
-                            break;
-                        default:
-                            break;
+                        messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
                     }
                 }
-                else //otherwise, move at random
+                else if (map.isLocationPassable(destination.Item1, destination.Item2))
                 {
-                    destination = aiService.moveRandom(monster);
-
+                    renderer.DrawAgent(map, monster, destination.Item1, destination.Item2);
                 }
-
-                if (destination != null)
+                else
                 {
-                    if (destination.Item1 == hero.locationX && destination.Item2 == hero.locationY)
-                    {
-                        //redraw in the same location
-                        renderer.DrawAgent(map, monster, monster.locationX, monster.locationY);
-                        //attack hero
-                        var attackResults = hero.attackedBy(monster);
-                        foreach (var attackMessage in attackResults)
-                        {
-                            messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
-                        }
-                    }
-                    else if (map.isLocationPassable(destination.Item1, destination.Item2))
-                    {
-                        renderer.DrawAgent(map, monster, destination.Item1, destination.Item2);
-                    }
-                    else
-                    {
-                        //redraw in the same location
-                        renderer.DrawAgent(map, monster, monster.locationX, monster.locationY);
-                    }
+                    //redraw in the same location
+                    renderer.DrawAgent(map, monster, monster.locationX, monster.locationY);
                 }
             }
         }
 
-        private void PlacePlayer(GameLogic.RLMap map, GameLogic.RLAgent hero, ConsoleKeyInfo cki)
+        private void PlacePlayer(GameLogic.RLMap map, RLPlayerAction action)
         {
             int playerDestinationX, playerDestinationY;
 
@@ -180,9 +168,8 @@ namespace Rougelike.GameLogic
             playerDestinationY = hero.locationY;
 
             var messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.White, "");
-            var playerInput = playerActionsService.GetActionFromInput(cki);
 
-            switch (playerInput)
+            switch (action)
             {
                 case RLPlayerAction.EmptyAction:
                     break;
@@ -209,15 +196,16 @@ namespace Rougelike.GameLogic
                     SaveGame();
                     break;
                 case RLPlayerAction.Load:
-                    //TODO: Figure out how to implement this!
-                    //  Is there a wrapper object around game that can replace this?
-                    //  Does Game run inside another object?
+                    LoadGame();
+                    playerDestinationX = hero.locationX;
+                    playerDestinationY = hero.locationY;
+                    renderer.DrawAgent(map, hero, hero.locationX, hero.locationY);
                     break;
                 default:
                     break;
             }
 
-            var destinationAgent = agents
+            var destinationAgent = monsters
                                     .Where(a => a.locationX == playerDestinationX && a.locationY == playerDestinationY)
                                     .Where(a => a.GetType() != typeof(RLHero))
                                     .FirstOrDefault();
@@ -253,14 +241,20 @@ namespace Rougelike.GameLogic
             //  Once we get on to additional levels, we can call GenerateAgents with ExcludeHero set
 
 
-            map = levelGenerator.GenerateMap();
+            if (map == null || map.Cells.Count == 0)
+            {
+                map = levelGenerator.GenerateMap();
+            }
 
             //draw dungeon
             renderer.DrawMap(map);
 
-            agents = levelGenerator.GenerateAgents(RLLevelGenerator.agentGeneratorBehaviour.IncludeHero);
+            if (monsters == null || monsters.Count == 0)
+            {
+                monsters = levelGenerator.GenerateMonsters();
+            }
 
-            ProcessInput(new ConsoleKeyInfo(' ', ConsoleKey.Spacebar, false, false, false));
+            ProcessInput(RLPlayerAction.EmptyAction);
         }
     }
 }

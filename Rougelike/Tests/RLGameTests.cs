@@ -17,7 +17,7 @@ namespace Rougelike.Tests
             var RLGame = new GameLogic.RLGame();
 
             Assert.IsNotNull(RLGame.messages);
-            Assert.IsNotNull(RLGame.agents);
+            Assert.IsNotNull(RLGame.monsters);
         }
 
         [Test]
@@ -31,16 +31,16 @@ namespace Rougelike.Tests
 
 
             Assert.IsNotNull(game.map);
-            Assert.IsTrue(game.agents.Count() > 0);
+            Assert.IsNotNull(game.hero);
         }
 
 
-        [TestCase(1, 0, ConsoleKey.UpArrow)]
-        [TestCase(1, 2, ConsoleKey.DownArrow)]
-        [TestCase(0, 1, ConsoleKey.LeftArrow)]
-        [TestCase(2, 1, ConsoleKey.RightArrow)]
-        [TestCase(1, 1, ConsoleKey.Spacebar)]
-        public void TakeTurnHandlesMove(int expectedX, int expectedY, ConsoleKey keyToPass)
+        [TestCase(1, 0, GameLogic.RLPlayerAction.MoveUp)]
+        [TestCase(1, 2, GameLogic.RLPlayerAction.MoveDown)]
+        [TestCase(0, 1, GameLogic.RLPlayerAction.MoveLeft)]
+        [TestCase(2, 1, GameLogic.RLPlayerAction.MoveRight)]
+        [TestCase(1, 1, GameLogic.RLPlayerAction.Wait)]
+        public void TakeTurnHandlesMove(int expectedX, int expectedY, GameLogic.RLPlayerAction actionToPass)
         {
             var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
 
@@ -48,16 +48,12 @@ namespace Rougelike.Tests
 
             game.SetUp();
 
-            var ConsoleKeyInfo = new ConsoleKeyInfo(keyChar: ' ', key: keyToPass, shift: false, alt: false, control: false);
+            game.ProcessInput(actionToPass);
 
-            game.ProcessInput(ConsoleKeyInfo);
+            Assert.AreEqual(expectedX, game.hero.locationX);
+            Assert.AreEqual(expectedY, game.hero.locationY);
 
-            var hero = GetHero(game);
-
-            Assert.AreEqual(expectedX, hero.locationX);
-            Assert.AreEqual(expectedY, hero.locationY);
-
-            if (keyToPass == ConsoleKey.Spacebar)
+            if (actionToPass == GameLogic.RLPlayerAction.Wait)
             {
                 Assert.IsTrue(game.messages.First().Item2 == "You wait");
 
@@ -71,38 +67,32 @@ namespace Rougelike.Tests
         {
             var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
 
-            var savingGame = new GameLogic.RLGame(new GameLogic.RLRenderer(), levelGenerator.Object, new IOLogic.JsonGameIOService());
+            var savingGame = new GameLogic.RLGame(levelGenerator: levelGenerator.Object);
 
             savingGame.SetUp();
 
-            var ConsoleKeyInfo = new ConsoleKeyInfo(keyChar: ' ', key: ConsoleKey.UpArrow, shift: false, alt: false, control: false);
 
-            savingGame.ProcessInput(ConsoleKeyInfo);
-
-            var hero = GetHero(savingGame);
+            savingGame.ProcessInput(GameLogic.RLPlayerAction.EmptyAction);
 
             savingGame.SaveGame();
 
-            var loadingGame = GameLogic.RLGame.LoadGame(new IOLogic.JsonGameIOService());
+            var savingMap = savingGame.map;
+            var savingAgents = savingGame.monsters;
+            var savingHero = savingGame.hero;
+
+            savingGame.LoadGame();
 
             //Map is the same
-            Assert.AreEqual(savingGame.map.Cells.Count, loadingGame.map.Cells.Count);
+            Assert.AreEqual(savingMap.Cells.Count, savingGame.map.Cells.Count); 
 
             //Agents are the same
-            Assert.AreEqual(savingGame.agents.Count, loadingGame.agents.Count);
-            foreach (var savedAgent in savingGame.agents)
-            {
-                Assert.IsTrue(loadingGame.agents.Contains(savedAgent), "loaded game does not contain the agent " + savedAgent.Name);
-            }
+            Assert.AreEqual(savingAgents.Count, savingGame.monsters.Count);
+            Assert.IsTrue(savingHero.Equals(savingGame.hero));
         }
 
 
 
 
-        private static GameLogic.RLAgent GetHero(GameLogic.RLGame game)
-        {
-            return game.agents.Where(a => a.GetType() == typeof(GameLogic.RLHero))
-                            .FirstOrDefault();
-        }
+
     }
 }

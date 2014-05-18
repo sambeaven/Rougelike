@@ -8,6 +8,8 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 
 - Implement saving/loading
 - Doors
+- Unit test combat system
+	- Maybe check for balance while we're at it?
 - Fog of war
 - Items and Equipment
 - Random dungeon generation

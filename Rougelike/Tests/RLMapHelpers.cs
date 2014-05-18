@@ -23,8 +23,11 @@ namespace Rougelike.Tests
                     new GameLogic.RLCell() { X = 2, Y = 2, Passable=true, Unoccupied=true}
                 }));
 
-            levelGenerator.Setup(l => l.GenerateAgents(GameLogic.RLLevelGenerator.agentGeneratorBehaviour.IncludeHero))
-                .Returns(new List<GameLogic.RLAgent>(){
+            levelGenerator.Setup(l => l.GenerateMonsters())
+                .Returns(new List<GameLogic.RLMonster>());
+
+            levelGenerator.Setup(l => l.GetDefaultHero())
+                .Returns(
                     new GameLogic.RLHero(
                             locationX: 1,
                             locationY: 1,
@@ -36,7 +39,7 @@ namespace Rougelike.Tests
                             name: "You",
                             color: ConsoleColor.Gray
                         )
-                });
+                );
             return levelGenerator;
         }
     }

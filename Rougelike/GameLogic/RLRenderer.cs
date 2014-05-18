@@ -39,7 +39,6 @@ namespace Rougelike.GameLogic
 
         public void DrawMap(RLMap map)
         {
-            //Console.Clear();
             Console.ForegroundColor = ConsoleColor.White;
 
             for (int x = 0; x < map.MaxWidth; x++)
