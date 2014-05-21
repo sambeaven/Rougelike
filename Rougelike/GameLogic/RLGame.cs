@@ -32,11 +32,13 @@ namespace Rougelike.GameLogic
 
         public RLHero hero;
 
+        public IRLDice dice;
+
         [JsonConstructor]
         public RLGame(RLRenderer renderer = null, Interfaces.IRLLevelGenerator levelGenerator = null,
             IJsonGameIOService jsonService = null, RLMap map = null, List<RLMonster> monsters = null,
             Stack<Tuple<ConsoleColor, string>> messages = null, RLPlayerActionsService playerActionsService = null,
-            RLAIService aiService = null, RLHero hero = null)
+            RLAIService aiService = null, RLHero hero = null, IRLDice dice = null)
         {
 
             this.renderer = renderer != null ? renderer : new RLRenderer();
@@ -48,6 +50,7 @@ namespace Rougelike.GameLogic
             this.playerActionsService = playerActionsService != null ? playerActionsService : new RLPlayerActionsService();
             this.aiService = aiService != null ? aiService : new RLAIService();
             this.hero = hero != null ? hero : this.levelGenerator.GetDefaultHero();
+            this.dice = dice != null ? dice : new RLDice(); 
         }
 
         /// <summary>
@@ -106,6 +109,7 @@ namespace Rougelike.GameLogic
             this.playerActionsService = loadedGame.playerActionsService;
             this.aiService = loadedGame.aiService;
             this.hero = loadedGame.hero;
+            this.dice = loadedGame.dice;
         }
 
         private void PlaceMonster(RLMap map, RLMonster monster)
@@ -142,7 +146,7 @@ namespace Rougelike.GameLogic
                     //redraw in the same location
                     renderer.DrawAgent(map, monster, monster.locationX, monster.locationY);
                     //attack hero
-                    var attackResults = hero.attackedBy(monster);
+                    var attackResults = hero.attackedBy(monster, dice);
                     foreach (var attackMessage in attackResults)
                     {
                         messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));
@@ -219,7 +223,7 @@ namespace Rougelike.GameLogic
             }
             else if (destinationAgent != null)
             {
-                var attackResults = destinationAgent.attackedBy(hero);
+                var attackResults = destinationAgent.attackedBy(hero, dice);
                 foreach (var attackMessage in attackResults)
                 {
                     messages.Push(new Tuple<ConsoleColor, string>(ConsoleColor.Red, attackMessage));

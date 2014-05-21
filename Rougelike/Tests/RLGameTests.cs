@@ -74,7 +74,9 @@ namespace Rougelike.Tests
 
             savingGame.ProcessInput(GameLogic.RLPlayerAction.EmptyAction);
 
-            savingGame.SaveGame();
+            bool testResult = savingGame.SaveGame();
+
+            Assert.IsTrue(testResult);
 
             var savingMap = savingGame.map;
             var savingAgents = savingGame.monsters;

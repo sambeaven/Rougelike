@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rougelike.GameLogic.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,13 @@ namespace Rougelike.GameLogic
 {
     public class RLAIService
     {
+        private IRLDice _dice;
+
+        public RLAIService(IRLDice dice = null)
+        {
+            _dice = dice != null ? dice : new RLDice();
+        }
+
         public Tuple<int, int> moveRandom(RLAgent agent)
         {
             Random randomDirection = new Random();

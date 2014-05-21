@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rougelike.GameLogic.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,23 +50,21 @@ namespace Rougelike.GameLogic
         /// </summary>
         /// <param name="attacker">the RLAgent that is attacking</param>
         /// <returns>A List of Strings describing what happened in combat</returns>
-        public List<string> attackedBy(RLAgent attacker)
+        public List<string> attackedBy(RLAgent attacker, IRLDice dice)
         {
             var messages = new List<string>();
-
-            Random d100 = new Random();
 
             messages.Add(attacker.Name + " attacks " + this.Name + "!");
 
             //Roll to hit - 1-100 + Dex for each. Highest wins.
-            int attackRoll = d100.Next(1, 100) + attacker.Dexterity;
-            int defenseRoll = d100.Next(1, 100) + this.Dexterity;
+            int attackRoll =    dice.RollD100() + attacker.Dexterity;
+            int defenseRoll =   dice.RollD100() + this.Dexterity;
 
             if (attackRoll > defenseRoll)
             {
                 //if hit, roll for damage = 1-100 + Str for attacker vs 1-100 + Con for defender
-                int attackWoundRoll = d100.Next(1, 100) + attacker.Strength;
-                int defenseWouldRoll = d100.Next(1, 100) + this.Constitution;
+                int attackWoundRoll = dice.RollD100() + attacker.Strength;
+                int defenseWouldRoll = dice.RollD100() + this.Constitution;
                 //difference (if positive) is damage to defender's hitpoints
 
                 if (attackWoundRoll > defenseWouldRoll)
