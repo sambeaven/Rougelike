@@ -15,7 +15,7 @@ namespace Rougelike.IOLogic
         public bool SaveGame(GameLogic.RLGame game)
         {
             JsonSerializer serializer = new JsonSerializer();
-            serializer.NullValueHandling = NullValueHandling.Include;
+            serializer.NullValueHandling = NullValueHandling.Ignore;
             
             string sPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -44,22 +44,22 @@ namespace Rougelike.IOLogic
         {
 
             JsonSerializer serializer = new JsonSerializer();
-            serializer.NullValueHandling = NullValueHandling.Include;
-            
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+
             string sPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            try
-            {
+            //try
+            //{
                 using (StreamReader reader = File.OpenText(sPath + "/save.txt"))
                 {
                     return (GameLogic.RLGame)serializer.Deserialize(reader, typeof(GameLogic.RLGame));
                 }
-            }
-            catch (Exception ex)
-            {
-                //Some sort of friendly message?
-                return null;
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    //Some sort of friendly message?
+            //    return null;
+            //}
             
         }
     }
