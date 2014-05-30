@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,7 @@ namespace Rougelike.GameLogic
 
         private Random _random;
 
+        [JsonConstructor]
         public RLDice(Random random)
         {
             _random = random;

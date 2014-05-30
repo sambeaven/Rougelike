@@ -9,9 +9,9 @@ namespace Rougelike.GameLogic
 {
     public class RLAIService
     {
-        private IRLDice _dice;
+        private RLDice _dice;
 
-        public RLAIService(IRLDice dice = null)
+        public RLAIService(RLDice dice = null)
         {
             _dice = dice != null ? dice : new RLDice();
         }

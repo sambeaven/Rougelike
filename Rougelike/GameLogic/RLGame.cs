@@ -26,19 +26,19 @@ namespace Rougelike.GameLogic
 
         private IJsonGameIOService ioService;
 
-        public RLPlayerActionsService playerActionsService;
+        private RLPlayerActionsService playerActionsService;
 
         private RLAIService aiService;
 
         public RLHero hero;
 
-        public IRLDice dice;
+        public RLDice dice;
 
         [JsonConstructor]
         public RLGame(RLRenderer renderer = null, Interfaces.IRLLevelGenerator levelGenerator = null,
             IJsonGameIOService jsonService = null, RLMap map = null, List<RLMonster> monsters = null,
             Stack<Tuple<ConsoleColor, string>> messages = null, RLPlayerActionsService playerActionsService = null,
-            RLAIService aiService = null, RLHero hero = null, IRLDice dice = null)
+            RLAIService aiService = null, RLHero hero = null, RLDice injectedDice = null)
         {
 
             this.renderer = renderer != null ? renderer : new RLRenderer();
@@ -48,9 +48,9 @@ namespace Rougelike.GameLogic
             this.monsters = monsters != null ? monsters : new List<RLMonster>();
             this.messages = messages != null ? messages : new Stack<Tuple<ConsoleColor, string>>();
             this.playerActionsService = playerActionsService != null ? playerActionsService : new RLPlayerActionsService();
-            this.aiService = aiService != null ? aiService : new RLAIService();
+            this.dice = injectedDice != null ? injectedDice : new RLDice(); 
+            this.aiService = aiService != null ? aiService : new RLAIService(dice);
             this.hero = hero != null ? hero : this.levelGenerator.GetDefaultHero();
-            this.dice = dice != null ? dice : new RLDice(); 
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Rougelike.GameLogic
 
         public void LoadGame()
         {
-            var loadedGame = ioService.LoadGame();
+            RLGame loadedGame = ioService.LoadGame();
             this.map = loadedGame.map;
             this.levelGenerator = loadedGame.levelGenerator;
             this.messages = loadedGame.messages;
@@ -110,6 +110,11 @@ namespace Rougelike.GameLogic
             this.aiService = loadedGame.aiService;
             this.hero = loadedGame.hero;
             this.dice = loadedGame.dice;
+        }
+
+        public RLPlayerAction GetActionFromInput(ConsoleKeyInfo keyinfo)
+        {
+            return playerActionsService.GetActionFromInput(keyinfo);
         }
 
         private void PlaceMonster(RLMap map, RLMonster monster)
