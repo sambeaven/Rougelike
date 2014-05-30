@@ -13,7 +13,8 @@ namespace Rougelike.GameLogic
         public enum MapType
         {
             boxMap,
-            emptyMap
+            emptyMap,
+            towerFloor
         }
 
 
@@ -21,7 +22,7 @@ namespace Rougelike.GameLogic
         public const char MAP_FLOOR = '.';
 
         [JsonConstructor]
-        public RLMap(MapType mapType, int mapWidth = 50, int mapHeight = 20, List<RLCell> cells = null)
+        public RLMap(MapType mapType, int mapWidth = 79, int mapHeight = 20, List<RLCell> cells = null)
         {
             this.MaxHeight = mapHeight;
             this.MaxWidth = mapWidth;
@@ -38,8 +39,69 @@ namespace Rougelike.GameLogic
             {
                 GenerateBoxMap(mapWidth, mapHeight);
             }
+            else if (mapType == MapType.towerFloor)
+            {
+                GenerateTowerFloor(mapWidth, mapHeight);
+            }
 
         }
+
+        private void GenerateTowerFloor(int mapWidth, int mapHeight)
+        {
+            for (int x = 0; x < mapWidth; x++)
+            {
+                for (int y = 0; y < mapHeight; y++)
+                {
+                    RLCell cell = new RLCell();
+                    cell.SetFloor();
+                    cell.Unoccupied = true;
+                    cell.X = x;
+                    cell.Y = y;
+                    this.Cells.Add(cell);
+                }
+            }
+
+            //generate cells
+
+
+            //outer edges are all walls
+            var outerWalls = this.Cells.Where(c => c.X == 0 || c.X == (mapWidth - 1)
+                || c.Y == 0 || c.Y == (mapHeight - 1));
+            foreach (var cell in outerWalls)
+            {
+
+                cell.SetWall();
+            }
+
+            //find corridor hub
+            Random rand = new Random();
+            int hubCellX = rand.Next(minValue: (mapWidth / 2) - 5, maxValue: (mapWidth / 2) - 5);
+            int hubCellY = rand.Next(minValue: (mapHeight / 2) - 5, maxValue: (mapHeight / 2) - 5);
+
+            var hubCell = this.Cells.Where(c => c.X == hubCellX && c.Y == hubCellY).FirstOrDefault();
+
+            hubCell.SetFloor();
+
+
+            //make a corridor going north/south, with walls at the edges.
+            var corridorWalls = this.Cells.Where(c => c.X == hubCell.X - 1 || c.X == hubCell.X + 1)
+                .Where(c => c.Y != hubCell.Y).ToList();
+
+            //make another corridor going east/west
+            corridorWalls.AddRange(this.Cells.Where(c => c.Y == hubCell.Y - 1 || c.Y == hubCell.Y + 1)
+                .Where(c => c.X != hubCell.X));
+            foreach (var cell in corridorWalls)
+            {
+                cell.SetWall();
+            }
+
+            //punch holes in the corridor walls
+
+
+            //divide up into rooms and punch holes in those as well
+
+        }
+
 
         public RLMap(List<RLCell> cells)
         {

@@ -64,7 +64,7 @@ namespace Rougelike.GameLogic
 
         public RLMap GenerateMap()
         {
-            return new GameLogic.RLMap(GameLogic.RLMap.MapType.boxMap);
+            return new GameLogic.RLMap(GameLogic.RLMap.MapType.towerFloor);
         }
     }
 }
