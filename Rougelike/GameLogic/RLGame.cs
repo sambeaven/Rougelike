@@ -31,6 +31,7 @@ namespace Rougelike.GameLogic
         private RLAIService aiService;
 
         public RLHero hero;
+        internal const string DESTINATION_IMPASSABLE = "Ouch! You walk into a wall.";
 
         public RLDice dice;
 
@@ -237,7 +238,7 @@ namespace Rougelike.GameLogic
             }
             else
             {
-                messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, "Ouch! You walk into a wall.");
+                messageToAdd = new Tuple<ConsoleColor, string>(ConsoleColor.Red, DESTINATION_IMPASSABLE);
                 renderer.DrawAgent(map, hero, hero.locationX, hero.locationY);
             }
             messages.Push(messageToAdd);

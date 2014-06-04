@@ -61,6 +61,40 @@ namespace Rougelike.Tests
 
         }
 
+        [Test]
+        public void WhenMovingIntoAWallAMessageIsDisplayed()
+        {
+            var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
+
+            levelGenerator.Setup(l => l.GenerateMap())
+                .Returns(new GameLogic.RLMap(GameLogic.RLMap.MapType.emptyMap, mapHeight: 3, mapWidth: 3, cells: new List<GameLogic.RLCell>(){
+                    new GameLogic.RLCell() { X = 0, Y = 0, Passable=true,  Unoccupied=true},
+                    new GameLogic.RLCell() { X = 1, Y = 0, Passable=false, Unoccupied=true},
+                    new GameLogic.RLCell() { X = 2, Y = 0, Passable=true,  Unoccupied=true},
+                    new GameLogic.RLCell() { X = 0, Y = 1, Passable=true,  Unoccupied=true},
+                    new GameLogic.RLCell() { X = 1, Y = 1, Passable=true,  Unoccupied=true},
+                    new GameLogic.RLCell() { X = 2, Y = 1, Passable=true,  Unoccupied=true},
+                    new GameLogic.RLCell() { X = 0, Y = 2, Passable=true,  Unoccupied=true},
+                    new GameLogic.RLCell() { X = 1, Y = 2, Passable=true,  Unoccupied=true},
+                    new GameLogic.RLCell() { X = 2, Y = 2, Passable=true,  Unoccupied=true}
+                }));
+            var game = new GameLogic.RLGame(new GameLogic.RLRenderer(), levelGenerator.Object, new IOLogic.JsonGameIOService());
+            game.SetUp();
+
+            game.ProcessInput(GameLogic.RLPlayerAction.MoveUp);
+
+            //Because 0,1 is marked as not passable, we shouldn't have moved
+            Assert.AreEqual(1, game.hero.locationX);
+            Assert.AreEqual(1, game.hero.locationY);
+
+            //There should also be a message
+            Assert.IsTrue(game.messages.Where(m => m.Item2 == GameLogic.RLGame.DESTINATION_IMPASSABLE)
+                                       .Count() > 0);
+
+            Assert.IsTrue(game.messages.Where(m => m.Item2 == GameLogic.RLGame.DESTINATION_IMPASSABLE)
+                                       .Select(m => m.Item1)
+                                       .FirstOrDefault() == ConsoleColor.Red);
+        }
 
         [Test]
         public void LoadingFromASavedGameReturnsTheSameGame()

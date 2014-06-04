@@ -21,6 +21,8 @@ namespace Rougelike.GameLogic
             cowardly
         }
 
+        public RLMonster() { }
+
         private MonsterBehaviour _monsterBehaviour;
 
         public MonsterBehaviour monsterBehaviour

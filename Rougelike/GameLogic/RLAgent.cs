@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Rougelike.GameLogic
 {
-    public class RLAgent : IEquatable<RLAgent>
+    public class RLAgent : IEquatable<RLAgent>, Rougelike.GameLogic.IRLAgent
     {
         public string Name { get; set; }
         public int locationX { get; set; }
@@ -44,6 +44,8 @@ namespace Rougelike.GameLogic
             this.Constitution = constitution;
             this.DisplayColor = color;
         }
+
+        internal RLAgent() { }
 
         /// <summary>
         /// Resolves attacks. Pass attacker into the target.

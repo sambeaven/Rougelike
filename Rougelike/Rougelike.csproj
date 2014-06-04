@@ -72,6 +72,7 @@
     <Compile Include="GameLogic\Interfaces\IRLLevelGenerator.cs" />
     <Compile Include="GameLogic\Interfaces\IRLRenderer.cs" />
     <Compile Include="GameLogic\Interfaces\IRLDice.cs" />
+    <Compile Include="GameLogic\IRLAgent.cs" />
     <Compile Include="GameLogic\RLAIService.cs" />
     <Compile Include="GameLogic\RLDice.cs" />
     <Compile Include="GameLogic\RLItem.cs" />
