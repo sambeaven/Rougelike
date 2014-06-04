@@ -1,4 +1,4 @@
-<h1>Rougelike</h1>
+﻿<h1>Rougelike</h1>
 
 <p>This is my first attempt at writing a simple Roguelike. It's all very rough, and will probably remain that way!</p>
 
@@ -7,12 +7,12 @@
 <h2>Current Todos:</h2>
 
 <ul>
-<li>Implement saving/loading<br />
+<li>Doors</li>
+<li>Unit test combat system<br />
 <ul><br />
-<li>I'm thinking we can save to some JSON objects and stick those in a text file</li><br />
-<li>This has the added benefit of being easy to edit and view</li><br />
-<li>Technically: we could either use JSON.net or a plain old DataContractJsonSerializer. I'm thinking the latter, just because it's already in the framework and speed isn't a concern.</li><br />
+<li>Maybe check for balance while we're at it?</li><br />
 </ul></li>
+<li>Fog of war</li>
 <li>Items and Equipment</li>
 <li>Random dungeon generation</li>
 <li>Random monster generation</li>
@@ -20,14 +20,16 @@
 <li>Time (certain actions take more time than others)</li>
 <li>Give monsters a sense of object permanence (as in, able to follow the player when they can't see them)</li>
 <li>Patrolling monsters</li>
-<li>Hunger</li>
+<li>Crafting</li>
 </ul>
 
 <h2>Known Bugs:</h2>
 
 <ul>
+<li>Does not build on Appveyor -- Calls to Console.Writeline are getting made in the unit tests. Need to abstract these out fully in the renderer.</li>
 <li>Monsters can get stuck next to each other<br />
 <ul><br />
 <li>We need them to recognize when they can see the player but the destination cell is impassable, and then find a way around it.</li><br />
 </ul></li>
+<li>Dependency injection for the RLDice object isn't working at the moment, because I can't deserialize to an interface or abstract class.</li>
 </ul>

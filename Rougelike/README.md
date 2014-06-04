@@ -21,6 +21,7 @@ This is my first attempt at writing a simple Roguelike. It's all very rough, and
 
 ## Known Bugs:
 
+- Does not build on Appveyor -- Calls to Console.Writeline are getting made in the unit tests. Need to abstract these out fully in the renderer.
 - Monsters can get stuck next to each other
     - We need them to recognize when they can see the player but the destination cell is impassable, and then find a way around it.
 - Dependency injection for the RLDice object isn't working at the moment, because I can't deserialize to an interface or abstract class.
