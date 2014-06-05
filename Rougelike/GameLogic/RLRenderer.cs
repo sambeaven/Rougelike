@@ -32,7 +32,7 @@ namespace Rougelike.GameLogic
             Console.ForegroundColor = agent.DisplayColor;
             Console.Write(agent.DisplayChar);
             Console.ForegroundColor = ConsoleColor.White;
-            map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = false;
+            map.Cells.Where(c => c.X == x && c.Y == y).FirstOrDefault().Unoccupied = false;
         }
 
         public void DrawMap(RLMap map)
