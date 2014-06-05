@@ -45,8 +45,9 @@ namespace Rougelike.Tests
         public void TakeTurnHandlesMove(int expectedX, int expectedY, GameLogic.RLPlayerAction actionToPass)
         {
             var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
+            var mockRenderer = Mock.Of<GameLogic.Interfaces.IRLRenderer>();
 
-            var game = new GameLogic.RLGame(new GameLogic.RLRenderer(), levelGenerator.Object, new IOLogic.JsonGameIOService());
+            var game = new GameLogic.RLGame(renderer: mockRenderer, levelGenerator: levelGenerator.Object, jsonService: new IOLogic.JsonGameIOService());
 
             game.SetUp();
 
@@ -80,7 +81,10 @@ namespace Rougelike.Tests
                     new GameLogic.RLCell() { X = 1, Y = 2, Passable=true,  Unoccupied=true},
                     new GameLogic.RLCell() { X = 2, Y = 2, Passable=true,  Unoccupied=true}
                 }));
-            var game = new GameLogic.RLGame(new GameLogic.RLRenderer(), levelGenerator.Object, new IOLogic.JsonGameIOService());
+
+            var mockRenderer = Mock.Of<GameLogic.Interfaces.IRLRenderer>();
+
+            var game = new GameLogic.RLGame(mockRenderer, levelGenerator.Object, new IOLogic.JsonGameIOService());
             game.SetUp();
 
             game.ProcessInput(GameLogic.RLPlayerAction.MoveUp);
@@ -102,8 +106,9 @@ namespace Rougelike.Tests
         public void LoadingFromASavedGameReturnsTheSameGame()
         {
             var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
+            var mockRenderer = Mock.Of<GameLogic.Interfaces.IRLRenderer>();
 
-            var savingGame = new GameLogic.RLGame(levelGenerator: levelGenerator.Object);
+            var savingGame = new GameLogic.RLGame(renderer: mockRenderer, levelGenerator: levelGenerator.Object);
 
             savingGame.SetUp();
 

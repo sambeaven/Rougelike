@@ -11,8 +11,9 @@ namespace Rougelike.Tests
         public void TwoEqualMapsAreEqual()
         {
             var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
-            var game1 = new GameLogic.RLGame(new GameLogic.RLRenderer(), levelGenerator.Object, new IOLogic.JsonGameIOService());
-            var game2 = new GameLogic.RLGame(new GameLogic.RLRenderer(), levelGenerator.Object, new IOLogic.JsonGameIOService());
+            var mockRenderer = Mock.Of<GameLogic.Interfaces.IRLRenderer>();
+            var game1 = new GameLogic.RLGame(mockRenderer, levelGenerator.Object, new IOLogic.JsonGameIOService());
+            var game2 = new GameLogic.RLGame(mockRenderer, levelGenerator.Object, new IOLogic.JsonGameIOService());
 
             game1.SetUp();
             game2.SetUp();

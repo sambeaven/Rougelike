@@ -161,6 +161,8 @@ namespace Rougelike.GameLogic
                 else if (map.isLocationPassable(destination.Item1, destination.Item2))
                 {
                     renderer.DrawAgent(map, monster, destination.Item1, destination.Item2);
+                    monster.locationX = destination.Item1;
+                    monster.locationY = destination.Item2;
                 }
                 else
                 {
@@ -226,6 +228,8 @@ namespace Rougelike.GameLogic
             {
 
                 renderer.DrawAgent(map, hero, playerDestinationX, playerDestinationY);
+                hero.locationX = playerDestinationX;
+                hero.locationY = playerDestinationY;
             }
             else if (destinationAgent != null)
             {

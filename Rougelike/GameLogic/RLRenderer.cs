@@ -30,8 +30,6 @@ namespace Rougelike.GameLogic
             map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
             Console.SetCursorPosition(x, y);
             Console.ForegroundColor = agent.DisplayColor;
-            agent.locationX = x;
-            agent.locationY = y;
             Console.Write(agent.DisplayChar);
             Console.ForegroundColor = ConsoleColor.White;
             map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = false;
