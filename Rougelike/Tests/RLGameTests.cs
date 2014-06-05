@@ -25,7 +25,9 @@ namespace Rougelike.Tests
         {
             var levelGenerator = RLMapHelpers.GetMockLevelGenerator();
 
-            var game = new GameLogic.RLGame(new GameLogic.RLRenderer(), levelGenerator.Object, new IOLogic.JsonGameIOService());
+            var mockRenderer = Mock.Of<GameLogic.Interfaces.IRLRenderer>();
+
+            var game = new GameLogic.RLGame(mockRenderer, levelGenerator.Object, new IOLogic.JsonGameIOService());
 
             game.SetUp();
 

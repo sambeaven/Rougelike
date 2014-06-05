@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Rougelike.GameLogic.Interfaces
 {
-    interface IRLRenderer
+    public interface IRLRenderer
     {
         void PostMessages(Stack<Tuple<ConsoleColor, string>> messages);
         void DrawAgent(RLMap map, RLAgent agent, int x, int y);

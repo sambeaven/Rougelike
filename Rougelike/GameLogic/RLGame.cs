@@ -18,7 +18,7 @@ namespace Rougelike.GameLogic
 
         public List<RLMonster> monsters = new List<RLMonster>();
 
-        private RLRenderer renderer;
+        private IRLRenderer renderer;
 
         public RLMap map;
 
@@ -36,7 +36,7 @@ namespace Rougelike.GameLogic
         public RLDice dice;
 
         [JsonConstructor]
-        public RLGame(RLRenderer renderer = null, Interfaces.IRLLevelGenerator levelGenerator = null,
+        public RLGame(Interfaces.IRLRenderer renderer = null, Interfaces.IRLLevelGenerator levelGenerator = null,
             IJsonGameIOService jsonService = null, RLMap map = null, List<RLMonster> monsters = null,
             Stack<Tuple<ConsoleColor, string>> messages = null, RLPlayerActionsService playerActionsService = null,
             RLAIService aiService = null, RLHero hero = null, RLDice injectedDice = null)
