@@ -88,19 +88,25 @@ namespace Rougelike.GameLogic
 
 
             //make a corridor going north/south, with walls at the edges.
-            var corridorWalls = this.Cells.Where(c => c.X == hubCell.X - 1 || c.X == hubCell.X + 1)
-                .Where(c => c.Y != hubCell.Y).ToList();
+            var corridorWalls = this.Cells
+                                    .Where(c => c.X == hubCell.X - 1 || c.X == hubCell.X + 1)
+                                    .Where(c => c.Y != hubCell.Y)
+                                    .ToList();
 
             //make another corridor going east/west
-            corridorWalls.AddRange(this.Cells.Where(c => c.Y == hubCell.Y - 1 || c.Y == hubCell.Y + 1)
-                .Where(c => c.X != hubCell.X));
+            corridorWalls.AddRange(this.Cells
+                                       .Where(c => c.Y == hubCell.Y - 1 || c.Y == hubCell.Y + 1)
+                                       .Where(c => c.X != hubCell.X));
+            
             foreach (var cell in corridorWalls)
             {
                 cell.SetWall();
             }
 
             //punch holes in the corridor walls
-
+            
+            //how do I do this? Actually punching the holes through feels messy.
+            //What I want to do is skip over a couple of the cells at random.
 
             //divide up into rooms and punch holes in those as well
 
