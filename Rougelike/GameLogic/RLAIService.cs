@@ -18,9 +18,8 @@ namespace Rougelike.GameLogic
 
         public Tuple<int, int> moveRandom(RLAgent agent)
         {
-            Random randomDirection = new Random();
 
-            int direction = randomDirection.Next(1, 5);
+            int direction = _dice.RollD4();
             int x = agent.locationX, y = agent.locationY;
 
             switch (direction)

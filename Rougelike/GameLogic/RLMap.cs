@@ -21,11 +21,16 @@ namespace Rougelike.GameLogic
         public const char MAP_WALL = '#';
         public const char MAP_FLOOR = '.';
 
+        public RLDice dice { get; set; }
+
         [JsonConstructor]
-        public RLMap(MapType mapType, int mapWidth = 79, int mapHeight = 20, List<RLCell> cells = null)
+        public RLMap(MapType mapType, int mapWidth = 79, int mapHeight = 20, List<RLCell> cells = null, RLDice injectedDice = null)
         {
             this.MaxHeight = mapHeight;
             this.MaxWidth = mapWidth;
+            this.dice = injectedDice == null ? new RLDice() : injectedDice;
+            
+
             if (cells != null)
             {
                 this.Cells = cells;
@@ -74,9 +79,8 @@ namespace Rougelike.GameLogic
             }
 
             //find corridor hub
-            Random rand = new Random();
-            int hubCellX = rand.Next(minValue: (mapWidth / 2) - 5, maxValue: (mapWidth / 2) - 5);
-            int hubCellY = rand.Next(minValue: (mapHeight / 2) - 5, maxValue: (mapHeight / 2) - 5);
+            int hubCellX = dice.GenerateBetweenTwoNumbers(minimumValue:(mapWidth / 2) - 5, maximumValue: (mapWidth / 2) - 5);
+            int hubCellY = dice.GenerateBetweenTwoNumbers(minimumValue:(mapHeight / 2) - 5, maximumValue: (mapHeight / 2) - 5);
 
             var hubCell = this.Cells.Where(c => c.X == hubCellX && c.Y == hubCellY).FirstOrDefault();
 

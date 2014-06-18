@@ -19,6 +19,11 @@ namespace Rougelike.GameLogic
             return _random.Next(1, 5);
         }
 
+        public int GenerateBetweenTwoNumbers(int minimumValue, int maximumValue)
+        {
+            return _random.Next(minimumValue, maximumValue);
+        }
+
         private Random _random;
 
         [JsonConstructor]
@@ -31,6 +36,8 @@ namespace Rougelike.GameLogic
         {
             _random = new Random();
         }
+
+
 
     }
 }
