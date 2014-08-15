@@ -94,6 +94,7 @@
     <Compile Include="Tests\RLGameTests.cs" />
     <Compile Include="Tests\RLMapHelpers.cs" />
     <Compile Include="Tests\RLMapTests.cs" />
+    <Compile Include="Tests\RLRendererInterfaceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
