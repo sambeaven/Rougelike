@@ -61,8 +61,6 @@ namespace Rougelike.GameLogic
         /// <returns>a bool representing whether or not the game has ended. True means gameOver, false means the game will continue.</returns>
         public bool ProcessInput(RLPlayerAction action)
         {
-            renderer.DrawMap(map);
-
             //movement
             PlacePlayer(map, action);
             foreach (var agent in monsters)

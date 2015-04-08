@@ -27,7 +27,12 @@ namespace Rougelike.GameLogic
 
         public void DrawAgent(RLMap map, RLAgent agent, int x, int y)
         {
-            map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault().Unoccupied = true;
+            RLCell oldCell = map.Cells.Where(c => c.X == agent.locationX && c.Y == agent.locationY).FirstOrDefault();
+            oldCell.Unoccupied = true;
+            Console.SetCursorPosition(oldCell.X, oldCell.Y);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(oldCell.DisplayCharacter);
+
             Console.SetCursorPosition(x, y);
             Console.ForegroundColor = agent.DisplayColor;
             Console.Write(agent.DisplayChar);
